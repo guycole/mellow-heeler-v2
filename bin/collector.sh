@@ -12,6 +12,7 @@ PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 WORK_DIR="/home/wombat/Documents/github/mellow-heeler-v2/src/wombat_collector"
 #
 echo "start collector"
+sleep 13
 cd $WORK_DIR
 source venv/bin/activate
 python3 ./collector.py
