@@ -1,0 +1,84 @@
+#
+# Title: collector.py
+# Description: add a json header to iwlist scan output
+# Development Environment: Ubuntu 22.04.5 LTS/python 3.10.12
+# Author: G.S. Cole (guycole at gmail dot com)
+#
+
+import datetime
+import json
+import socket
+import sys
+import time
+import uuid
+import zoneinfo
+
+from parser import Parser
+
+import yaml
+from yaml.loader import SafeLoader
+
+class Collector:
+    """make the iwlist observation file"""
+
+    def __init__(self, args: dict[str, any]):
+        self.fresh_dir = configuration["freshDir"]
+        self.site = configuration["site"]
+
+    def file_writer(self, dir_name: str, json_preamble: str) -> None:
+        file_name = self.file_name(dir_name)
+        print(f"output filename: {file_name}")
+
+        try:
+            with open(file_name, "w") as out_file:
+                out_file.write(json_preamble + "\n")
+                out_file.write("RAWBUFFER\n")
+                out_file.writelines(self.raw_buffer)
+        except Exception as error:
+            print(error)
+
+    def execute(self, file_name: str) -> None:
+        print(f"collector: {file_name}")
+
+        parser = Parser()
+        observations = parser.execute(file_name)
+
+        epoch_seconds = int(time.time())
+        dt_object_utc = datetime.datetime.fromtimestamp(
+            epoch_seconds, tz=zoneinfo.ZoneInfo("UTC")
+        )
+
+        results = {
+            "geoLoc": {
+                "site": self.site
+            },
+            "epochSeconds": epoch_seconds, 
+            "iso8601": dt_object_utc.isoformat(),
+            "platform": socket.gethostname(),
+            "project": "heeler-v2",
+            "version": 1,
+            "observations": observations
+        }
+
+        print(results)
+
+#
+# argv[1] = configuration filename
+#
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        file_name = sys.argv[1]
+    else:
+        file_name = "config.yaml"
+
+    with open(file_name, "r") as in_file:
+        try:
+            configuration = yaml.load(in_file, Loader=SafeLoader)
+            collector = Collector(configuration)
+            collector.execute(configuration["scanFile"])
+        except yaml.YAMLError as error:
+            print(error)
+
+# ;;; Local Variables: ***
+# ;;; mode:python ***
+# ;;; End: ***
