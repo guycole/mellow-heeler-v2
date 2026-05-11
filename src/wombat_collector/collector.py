@@ -65,6 +65,7 @@ class Collector:
             },
             "epochSeconds": epoch_seconds, 
             "iso8601": dt_object_utc.isoformat(),
+            "mode": "iwlist",
             "platform": socket.gethostname(),
             "project": "heeler-v2",
             "version": 1,
