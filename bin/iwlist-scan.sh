@@ -5,8 +5,8 @@
 # Development Environment: Ubuntu 22.04.05 LTS
 # Author: Guy Cole (guycole at gmail dot com)
 #
-# must run from root crontab or iwlist will not use wlan1
-# * * * * * /home/gsc/Documents/github/mellow-heeler/bin/iwlist-scan.sh > /dev/null 2>&1
+# must run from root crontab
+# * * * * * /home/wombat/Documents/github/mellow-heeler-v2/bin/iwlist-scan.sh > /dev/null 2>&1
 #
 PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #

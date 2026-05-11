@@ -25,20 +25,31 @@ class Collector:
         self.fresh_dir = configuration["freshDir"]
         self.site = configuration["site"]
 
-    def file_writer(self, dir_name: str, json_preamble: str) -> None:
-        file_name = self.file_name(dir_name)
-        print(f"output filename: {file_name}")
+    def copy_raw_file(self, source_file: str, dest_file: str) -> None:
+        try:
+            with open(source_file, "r") as in_file:
+                with open(dest_file, "w") as out_file:
+                    out_file.writelines(in_file.readlines())
+        except Exception as error:
+            print(error)
 
+    def json_file_writer(self, file_name: str, json_data: dict[str, any]) -> None:
         try:
             with open(file_name, "w") as out_file:
-                out_file.write(json_preamble + "\n")
-                out_file.write("RAWBUFFER\n")
-                out_file.writelines(self.raw_buffer)
+                json.dump(json_data, out_file)
         except Exception as error:
             print(error)
 
     def execute(self, file_name: str) -> None:
-        print(f"collector: {file_name}")
+        print(f"collector reading: {file_name}")
+
+        base_file_name = str(uuid.uuid4())
+        print(f"base filename: {base_file_name}")
+
+        outfile_json = f"{self.fresh_dir}/{base_file_name}.json"
+        outfile_raw = f"{self.fresh_dir}/{base_file_name}.raw"
+
+        self.copy_raw_file(file_name, outfile_raw)
 
         parser = Parser()
         observations = parser.execute(file_name)
@@ -60,7 +71,7 @@ class Collector:
             "observations": observations
         }
 
-        print(results)
+        self.json_file_writer(outfile_json, results)
 
 #
 # argv[1] = configuration filename
