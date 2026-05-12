@@ -71,7 +71,7 @@ class Collector:
                 "site": self.site
             },
             "epochSeconds": epoch_seconds, 
-            "fileName": outfile_json,
+            "fileName": f"{base_file_name}.json",
             "iso8601": dt_object_utc.isoformat(),
             "mode": "iwlist",
             "platform": socket.gethostname(),
