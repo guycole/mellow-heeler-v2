@@ -217,4 +217,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-src/wombat_collector/config.yaml
+src/collector/config.yaml
