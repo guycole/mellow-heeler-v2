@@ -23,6 +23,10 @@ class Collector:
 
     def __init__(self, args: dict[str, any]):
         self.fresh_dir = configuration["freshDir"]
+
+        self.altitude = configuration["altitude"]
+        self.latitude = configuration["latitude"]
+        self.longitude = configuration["longitude"]
         self.site = configuration["site"]
 
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
@@ -61,6 +65,9 @@ class Collector:
 
         results = {
             "geoLoc": {
+                "altitude": self.altitude,
+                "latitude": self.latitude,
+                "longitude": self.longitude,
                 "site": self.site
             },
             "epochSeconds": epoch_seconds, 
