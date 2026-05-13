@@ -19,8 +19,6 @@ import yaml
 from yaml.loader import SafeLoader
 
 class Collector:
-    """make the iwlist observation file"""
-
     def __init__(self, args: dict[str, any]):
         self.fresh_dir = configuration["freshDir"]
 
@@ -40,7 +38,7 @@ class Collector:
     def json_file_writer(self, file_name: str, json_data: dict[str, any]) -> None:
         try:
             with open(file_name, "w") as out_file:
-                json.dump(json_data, out_file)
+                json.dump(json_data, out_file, indent=4)
         except Exception as error:
             print(error)
 
