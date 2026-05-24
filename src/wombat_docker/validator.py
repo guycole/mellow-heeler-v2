@@ -11,7 +11,6 @@ import os
 
 from postgres import PostGres
 
-
 class Validator:
 
     def __init__(self, postgres: PostGres):
@@ -77,9 +76,7 @@ class Validator:
                 "platform": self.json_preamble["platform"],
             }
         else:
-            logger.error(
-                f"invalid version:{self.json_preamble['version']} for file:{self.file_name}"
-            )
+            logger.error(f"invalid version:{self.json_preamble['version']} for file:{self.file_name}")
             return {}
 
     def file_processor(self, file_name: str) -> None:
@@ -118,7 +115,6 @@ class Validator:
             self.file_processor(target)
 
         logger.info(f"success:{self.success} failure:{self.failure}")
-
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***

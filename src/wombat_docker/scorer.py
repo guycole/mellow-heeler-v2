@@ -12,7 +12,6 @@ import os
 from postgres import PostGres
 from sql_table import LoadLog
 
-
 class Scorer:
 
     def __init__(self, postgres: PostGres):
