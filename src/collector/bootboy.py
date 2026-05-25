@@ -38,6 +38,17 @@ class BootBoy:
         config_data["gpsEnable"] = False
         config_data["scanFile"] = "/tmp/iwlist.scan"
 
+        # Build equipment section
+        receiver = config_data.get("receiver", {})
+        equipment = {
+            "antenna": receiver.get("antenna", "xxx"),
+            "crate": config_data.get("crateName", "xxx"),
+            "receiver": str(receiver.get("id", "xxx")),
+            "platform": target,
+            "type": receiver.get("type", config_data.get("type", "xxx")),
+        }
+        config_data["equipment"] = equipment
+
         # Write to config.yaml in the current directory
         try:
             with open("config.yaml", "w") as f:
