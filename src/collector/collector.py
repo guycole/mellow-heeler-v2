@@ -64,15 +64,24 @@ class Collector:
         )
 
         results = {
+            "equipment": {
+                "antenna": "xxx",
+                "crate": "xxx",
+                "receiver": "xxx",
+                "platform": socket.gethostname(),
+                "type": "xxx"
+            },
             "geoLoc": {
                 "altitude": self.altitude,
                 "latitude": self.latitude,
                 "longitude": self.longitude,
                 "siteName": self.site_name
             },
-            "epochSeconds": epoch_seconds, 
+            "timeStamp": {
+                "epochSeconds": epoch_seconds,
+                "iso8601": dt_object_utc.isoformat()
+            },
             "fileName": f"{base_file_name}.json",
-            "iso8601": dt_object_utc.isoformat(),
             "mode": "iwlist",
             "platform": self.host_name,
             "project": "heeler-v2",
