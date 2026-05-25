@@ -21,11 +21,13 @@ from yaml.loader import SafeLoader
 class Collector:
     def __init__(self, args: dict[str, any]):
         self.fresh_dir = configuration["freshDir"]
+        self.gps_enable = configuration["gpsEnable"]
+        self.host_name = configuration["hostName"]
 
-        self.altitude = configuration["altitude"]
-        self.latitude = configuration["latitude"]
-        self.longitude = configuration["longitude"]
-        self.site = configuration["site"]
+        self.altitude = configuration["geoLoc"]["altitude"]
+        self.latitude = configuration["geoLoc"]["latitude"]
+        self.longitude = configuration["geoLoc"]["longitude"]
+        self.site_name = configuration["geoLoc"]["siteName"]
 
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
         try:
@@ -66,13 +68,13 @@ class Collector:
                 "altitude": self.altitude,
                 "latitude": self.latitude,
                 "longitude": self.longitude,
-                "site": self.site
+                "siteName": self.site_name
             },
             "epochSeconds": epoch_seconds, 
             "fileName": f"{base_file_name}.json",
             "iso8601": dt_object_utc.isoformat(),
             "mode": "iwlist",
-            "platform": socket.gethostname(),
+            "platform": self.host_name,
             "project": "heeler-v2",
             "version": 1,
             "observations": observations
