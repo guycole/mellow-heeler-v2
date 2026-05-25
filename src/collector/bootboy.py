@@ -52,32 +52,32 @@ class BootBoy:
         crontab_entry = "*/10 * * * * /home/wombat/Documents/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1"
 
         try:
-            # Get current crontab
-            result = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+            # Always operate on the 'wombat' user's crontab
+            result = subprocess.run(["crontab", "-u", "wombat", "-l"], capture_output=True, text=True)
             if result.returncode == 0:
                 current_crontab = result.stdout.splitlines()
             else:
                 current_crontab = []
         except Exception as e:
-            print(f"Error reading crontab: {e}")
+            print(f"Error reading wombat's crontab: {e}")
             return
 
         # Check if entry already exists
         if any(crontab_entry in line for line in current_crontab):
-            print("Crontab entry already exists.")
+            print("Crontab entry already exists for wombat.")
             return
 
         # Add the new entry
         current_crontab.append(crontab_entry)
         new_crontab = "\n".join(current_crontab) + "\n"
         try:
-            proc = subprocess.run(["crontab", "-"], input=new_crontab, text=True)
+            proc = subprocess.run(["crontab", "-u", "wombat", "-"], input=new_crontab, text=True)
             if proc.returncode == 0:
-                print("Crontab updated successfully.")
+                print("Crontab updated successfully for wombat.")
             else:
-                print("Failed to update crontab.")
+                print("Failed to update wombat's crontab.")
         except Exception as e:
-            print(f"Error updating crontab: {e}")
+            print(f"Error updating wombat's crontab: {e}")
 
 
     def execute(self, target: str) -> None:
