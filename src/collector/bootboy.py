@@ -33,26 +33,34 @@ class BootBoy:
             print(f"Error reading {admin_json_path}: {e}")
             sys.exit(1)
 
-        # Set required fields
-        config_data["freshDir"] = "/var/wombat/fresh/heeler"
-        config_data["gpsEnable"] = False
-        config_data["scanFile"] = "/tmp/iwlist.scan"
-
-        # Build equipment section
+        # Compose new config dict for YAML output
         receiver = config_data.get("receiver", {})
-        equipment = {
-            "antenna": receiver.get("antenna", "xxx"),
-            "crate": config_data.get("crateName", "xxx"),
-            "receiver": str(receiver.get("id", "xxx")),
-            "platform": target,
-            "type": receiver.get("type", config_data.get("type", "xxx")),
+        geoLoc = config_data.get("geoLoc", {})
+        crateName = config_data.get("crateName", "xxx")
+        hostName = config_data.get("hostName", target)
+        type_val = config_data.get("type", "xxx")
+
+        yaml_config = {
+            "crateName": crateName,
+            "equipment": {
+                "hostName": hostName,
+                "type": type_val,
+            },
+            "receiver": {
+                "antenna": receiver.get("antenna", "xxx"),
+                "receiver_id": receiver.get("id", "xxx"),
+                "type": receiver.get("type", "xxx"),
+            },
+            "freshDir": "/var/wombat/fresh/heeler",
+            "geoLoc": geoLoc,
+            "gpsEnable": False,
+            "scanFile": "/tmp/iwlist.scan",
         }
-        config_data["equipment"] = equipment
 
         # Write to config.yaml in the current directory
         try:
             with open("config.yaml", "w") as f:
-                yaml.dump(config_data, f, default_flow_style=False)
+                yaml.dump(yaml_config, f, default_flow_style=False)
             print("config.yaml generated successfully.")
         except Exception as e:
             print(f"Error writing config.yaml: {e}")
