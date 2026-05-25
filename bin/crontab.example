@@ -1,0 +1,4 @@
+# iwlist-scan.sh must run from root crontab
+#* * * * * /home/wombat/Documents/github/mellow-heeler-v2/bin/iwlist-scan.sh > /dev/null 2>&1
+*/10 * * * * /home/wombat/Documents/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1
+#
