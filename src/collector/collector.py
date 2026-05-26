@@ -20,14 +20,21 @@ from yaml.loader import SafeLoader
 
 class Collector:
     def __init__(self, args: dict[str, any]):
+        self.crate_name = args["crateName"]
         self.fresh_dir = configuration["freshDir"]
         self.gps_enable = configuration["gpsEnable"]
-        self.host_name = configuration["hostName"]
+
+        self.host_name = configuration['equipment']["hostName"]
+        self.host_type = configuration['equipment']["type"]
 
         self.altitude = configuration["geoLoc"]["altitude"]
         self.latitude = configuration["geoLoc"]["latitude"]
         self.longitude = configuration["geoLoc"]["longitude"]
         self.site_name = configuration["geoLoc"]["siteName"]
+
+        self.antenna = configuration["receiver"]["antenna"]
+        self.receiver_id = configuration["receiver"]["receiver_id"]
+        self.receiver_type = configuration["receiver"]["type"]
 
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
         try:
@@ -65,11 +72,11 @@ class Collector:
 
         results = {
             "equipment": {
-                "antenna": "xxx",
-                "crate": "xxx",
-                "receiver": "xxx",
-                "platform": socket.gethostname(),
-                "type": "xxx"
+                "antenna": self.antenna,  
+                "receiver_id": self.receiver_id,
+                "receiver_type": self.receiver_type,
+                "platform": self.host_type,
+                "hostName": self.host_name  
             },
             "geoLoc": {
                 "altitude": self.altitude,
@@ -81,9 +88,9 @@ class Collector:
                 "epochSeconds": epoch_seconds,
                 "iso8601": dt_object_utc.isoformat()
             },
+            "crate": self.crate_name,
             "fileName": f"{base_file_name}.json",
             "mode": "iwlist",
-            "platform": self.host_name,
             "project": "heeler-v2",
             "version": 1,
             "observations": observations

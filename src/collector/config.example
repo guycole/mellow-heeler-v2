@@ -1,25 +1,16 @@
-#
-# repository of freshly collected observations
+crateName: wombat04
+equipment:
+  hostName: pi3b
+  type: rpi3
 freshDir: /var/wombat/fresh/heeler
-#
-# collection host location
-altitude: 321
-latitude: 12.34
-longitude: 123.45
-#site: anderson1
-site: development
-#site: mobile1
-#site: vallejo1
-#
-# file to process
-scanFile: /tmp/iwlist.scan
-#
-#
-# true, there is a GPS available
+geoLoc:
+  altitude: 0
+  latitude: 38.108
+  longitude: -122.268
+  siteName: vallejo01
 gpsEnable: false
-#
-# stations which inhibit collection
-homePlateStations:
-  - 'station1'
-  - 'station2'
-#
+receiver:
+  antenna: whip
+  receiver_id: 2
+  type: ac-1300
+scanFile: /tmp/iwlist.scan
