@@ -1,0 +1,26 @@
+--
+-- Title: load_log.psql
+-- Description: file load history
+--
+-- file_name within fresh_dir
+-- file_time is from preamble zTimeMs
+-- file_type is from preamble project and version i.e. heeler_v1
+-- load_time is when file was processed
+-- obs_quantity is population of observations in file
+-- platform is from preamble platform
+-- site is from preamble geoLoc.site
+--
+create table heeler_load_log (
+  id            bigserial    primary key,
+  epoch_seconds bigint       not null,
+  file_name     varchar(48)  unique not null,
+  file_time     timestamp    not null,
+  load_time     timestamp    not null default CURRENT_TIMESTAMP,
+  mode          varchar(16)  not null,
+  obs_quantity  smallint     not null,
+  platform      varchar(16)  not null,
+  project       varchar(16)  not null
+);
+
+grant select, insert, update, delete on heeler_load_log to heeler_client;
+grant usage, select on sequence heeler_load_log_id_seq to heeler_client;
