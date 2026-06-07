@@ -23,8 +23,7 @@ class HeelerApp:
         self.score_limit = score_limit
         self.stunt_box = stunt_box
 
-        self.db_conn = "postgresql+psycopg2://heeler_client:batabat@host.docker.internal:5432/heeler"
-
+        # wombat docker
         self.db_conn = "postgresql+psycopg2://heeler_client:batabat@172.17.0.1:5432/heeler"
 
         # mac development

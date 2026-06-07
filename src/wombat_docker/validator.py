@@ -63,9 +63,9 @@ class Validator:
                 return False
             else:
                 load_log = {
-                    "epoch_seconds": self.raw_buffer["epochSeconds"],
+                    "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
                     "file_name": test_file_name,
-                    "file_time": self.raw_buffer["iso8601"],
+                    "file_time": self.raw_buffer["timeStamp"]["iso8601"],
                     "load_time": datetime.datetime.now(),
                     "mode": self.raw_buffer["mode"],
                     "obs_quantity": len(self.raw_buffer["observations"]),
