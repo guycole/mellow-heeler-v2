@@ -19,14 +19,15 @@ class Validator:
     def __init__(self, postgres: PostGres):
         self.postgres = postgres
 
-        # path is from inside docker container
+        # path from inside docker container
         self.failure_dir = "/mnt/wombat/failure/"
         self.fresh_dir = "/mnt/wombat/fresh/heeler"
         self.success_dir = "/mnt/wombat/heeler/success/"
 
-        self.failure_dir = "/var/wombat/failure/"
-        self.fresh_dir = "/var/wombat/fresh/heeler"
-        self.success_dir = "/var/wombat/heeler/success/"
+	# path from macbook dev
+        # self.failure_dir = "/var/wombat/failure/"
+        # self.fresh_dir = "/var/wombat/fresh/heeler"
+        # self.success_dir = "/var/wombat/heeler/success/"
 
         self.failure = 0
         self.success = 0
@@ -49,7 +50,7 @@ class Validator:
             with open(file_name, "r", encoding="utf-8") as in_file:
                 self.raw_buffer = json.load(in_file)
         except Exception as error:
-            print(f"file read failed for {file_name}: {error}")
+            logger.error(f"file read failed for {file_name}: {error}")
             return False
 
         return True
@@ -97,8 +98,6 @@ class Validator:
         return False
 
     def file_processor(self, file_name1: str, file_name2: str) -> None:
-        print(f"file_name1:{file_name1} file_name2:{file_name2}")
-
         if os.path.isfile(file_name1) is False:
             logger.warning(f"skipping non-file:{file_name1}")
             self.file_failure(file_name1)
