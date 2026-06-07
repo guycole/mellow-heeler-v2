@@ -39,7 +39,7 @@ class Validator:
         os.rename(file_name, self.failure_dir + file_name)
 
     def file_success(self, file_name1: str, file_name2: str):
-        logger.info(f"file success:{file_name1}, {file_name2}")
+        #logger.info(f"file success:{file_name1}, {file_name2}")
 
         self.success += 1
         os.rename(file_name1, self.success_dir + "/" + file_name1)
@@ -69,7 +69,7 @@ class Validator:
                     "load_time": datetime.datetime.now(),
                     "mode": self.raw_buffer["mode"],
                     "obs_quantity": len(self.raw_buffer["observations"]),
-                    "platform": self.raw_buffer["platform"],
+                    "platform": self.raw_buffer["equipment"]["platform"],
                     "project": self.raw_buffer["project"],
                 }
 
@@ -82,8 +82,6 @@ class Validator:
         return False
 
     def file_processor(self, file_name1: str, file_name2: str) -> None:
-        print(f"file_name1:{file_name1} file_name2:{file_name2}")
-
         if os.path.isfile(file_name1) is False:
             logger.warning(f"skipping non-file:{file_name1}")
             self.file_failure(file_name1)
