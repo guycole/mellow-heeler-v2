@@ -24,7 +24,7 @@ class Validator:
         self.fresh_dir = "/mnt/wombat/fresh/heeler"
         self.success_dir = "/mnt/wombat/heeler/success/"
 
-	# path from macbook dev
+        # path for mac development
         # self.failure_dir = "/var/wombat/failure/"
         # self.fresh_dir = "/var/wombat/fresh/heeler"
         # self.success_dir = "/var/wombat/heeler/success/"
@@ -55,22 +55,6 @@ class Validator:
 
         return True
 
-    def load_log(self) -> dict[str, any]:
-        if self.json_preamble["version"] == 1:
-            epoch = self.json_preamble["zTime"]
-            utc_dt = datetime.datetime.fromtimestamp(epoch, tz=datetime.timezone.utc)
-
-            return {
-                "file_name": self.file_name,
-                "file_time": utc_dt,
-                "file_type": f"{self.json_preamble['project']}_{self.json_preamble['version']}",
-                "obs_quantity": len(self.json_preamble["wifi"]),
-                "platform": self.json_preamble["platform"],
-            }
-        else:
-            logger.error(f"invalid version:{self.json_preamble['version']} for file:{self.file_name}")
-            return {}
-
     def load_log_test(self, test_file_name: str) -> bool:
         try:
             candidate = self.postgres.load_log_select_by_file_name(test_file_name)
@@ -98,6 +82,8 @@ class Validator:
         return False
 
     def file_processor(self, file_name1: str, file_name2: str) -> None:
+        print(f"file_name1:{file_name1} file_name2:{file_name2}")
+
         if os.path.isfile(file_name1) is False:
             logger.warning(f"skipping non-file:{file_name1}")
             self.file_failure(file_name1)
@@ -113,6 +99,14 @@ class Validator:
         test_file_name = file_name1 if file_name1.endswith(".json") else file_name2
         if not self.file_reader(test_file_name):
             logger.warning(f"file read failed for {test_file_name}")
+            self.file_failure(file_name1)
+            self.file_failure(file_name2)
+            return
+        
+        if self.raw_buffer["version"] == 1 and self.raw_buffer["project"] == "heeler-v2":
+            pass
+        else:
+            logger.warning(f"invalid version or project for {test_file_name}")
             self.file_failure(file_name1)
             self.file_failure(file_name2)
             return
