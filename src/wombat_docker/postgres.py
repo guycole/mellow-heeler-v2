@@ -58,8 +58,6 @@ class PostGres:
         return candidate
 
     def load_log_insert(self, args: dict[str, any]) -> LoadLog:
-        args["duration_ms"] = 0
-
         candidate = LoadLog(args)
 
         try:
