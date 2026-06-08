@@ -17,6 +17,7 @@ import sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import select
+from sqlalchemy import desc
 
 from sql_table import (
     DailyScore,
@@ -71,12 +72,16 @@ class PostGres:
 
     def load_log_select_all(self) -> list[LoadLog]:
         with self.Session() as session:
-            return session.scalars(select(LoadLog)).all()
+            return session.scalars(
+                select(LoadLog).order_by(desc(LoadLog.load_time), desc(LoadLog.id))
+            ).all()
 
     def load_log_select_all_by_date(self, target: datetime.date) -> list[LoadLog]:
         with self.Session() as session:
             return session.scalars(
-                select(LoadLog).filter(func.date(LoadLog.file_time) == target)
+                select(LoadLog)
+                .filter(func.date(LoadLog.load_time) == target)
+                .order_by(desc(LoadLog.load_time), desc(LoadLog.id))
             ).all()
 
     def load_log_select_by_file_name(self, file_name: str) -> LoadLog:

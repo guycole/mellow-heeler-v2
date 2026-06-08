@@ -23,7 +23,7 @@ class Scorer:
         try:
             rows = self.postgres.load_log_select_all()
             for row in rows:
-                candidate = row.file_time.date()
+                candidate = row.load_time.date()
                 if candidate not in results:
                     results.append(candidate)
         except Exception as error:

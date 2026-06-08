@@ -52,8 +52,10 @@ class Koala:
             logger.warning(f"file read failed for {file_name}")
             return
         
+        epochSeconds = self.raw_buffer.get("timeStamp", {}).get("epochSeconds", 0)
+        
         result = {
-            "epochSeconds": self.raw_buffer.get("timeStamp", {}).get("epochSeconds", 0),
+            "epochSeconds": epochSeconds,
             "geoLoc": {
                 "site": self.raw_buffer.get("geoLoc", {}).get("siteName", "unknown")
             },
@@ -63,7 +65,7 @@ class Koala:
             "wifi": self.raw_buffer.get("observations", []),
         }
 
-        out_file_name = f"{self.koala_dir}/{file_name}"
+        out_file_name = f"{self.koala_dir}/{epochSeconds}.koala"
         self.file_writer(out_file_name, result)
         os.chown(out_file_name, self.wombat_uid, self.wombat_gid)
 
