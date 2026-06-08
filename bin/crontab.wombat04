@@ -1,0 +1,11 @@
+#
+# wombat04
+#
+* * * * * /home/wombat/Documents/github/mellow-wombat/bin/rsync.sh > /dev/null 2>&1
+#
+12 */12 * * * /home/wombat/Documents/github/mellow-wombat/bin/admin-copy.sh wombat04 > /dev/null 2>&1
+#
+03 * * * * /home/wombat/Documents/github/mellow-wombat/bin/heeler-validate.sh > /dev/null 2>&1
+07 00 * * 1 /home/wombat/Documents/github/mellow-heeler-v2/bin/archiver.sh > /dev/null 2>&1
+13 00 * * 1 /home/wombat/Documents/github/mellow-heeler-v2/bin/wombat-to-s3.sh wombat04 > /dev/null 2>&1
+#

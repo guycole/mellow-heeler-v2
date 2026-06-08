@@ -48,8 +48,6 @@ class Koala:
             logger.warning(f"file read failed for {file_name}")
             return
         
-        print(self.raw_buffer)
-        
         result = {
             "epochSeconds": self.raw_buffer.get("timeStamp", {}).get("epochSeconds", 0),
             "geoLoc": {
