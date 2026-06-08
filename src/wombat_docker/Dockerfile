@@ -14,10 +14,16 @@ RUN set -eux; \
 	if ! id -u wombat >/dev/null 2>&1; then \
 		addgroup --system wombat; \
 		adduser --system --ingroup wombat wombat; \
-	fi; \
-	uid="$(id -u wombat)"; \
-	gid="$(id -g wombat)"; \
-	printf 'export WOMBAT_UID=%s\nexport WOMBAT_GID=%s\n' "$uid" "$gid" > /app/wombat_env.sh
+	fi
+
+RUN printf '%s\n' '#!/bin/sh' 'set -eu' \
+	'uid="$(id -u wombat)"' \
+	'gid="$(id -g wombat)"' \
+	'printf "WOMBAT_UID=%s\nWOMBAT_GID=%s\n" "$uid" "$gid" > /app/wombat_env.env' \
+	> /usr/local/bin/collect-wombat-ids.sh \
+	&& chmod +x /usr/local/bin/collect-wombat-ids.sh
+
+RUN /usr/local/bin/collect-wombat-ids.sh
 
 # Create and activate virtualenv first
 RUN python -m venv /app/venv
@@ -35,7 +41,7 @@ COPY scorer.py ./
 COPY sql_table.py ./
 COPY validator.py ./
 
-RUN printf '%s\n' '#!/bin/sh' 'set -e' '[ -f /app/wombat_env.sh ] && . /app/wombat_env.sh' 'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
+RUN printf '%s\n' '#!/bin/sh' 'set -e' '/usr/local/bin/collect-wombat-ids.sh' 'set -a' '[ -f /app/wombat_env.env ] && . /app/wombat_env.env' 'set +a' 'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
 	&& chmod +x /usr/local/bin/docker-entrypoint.sh
 
 RUN mkdir -p /mnt/wombat
