@@ -9,11 +9,18 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+ARG WOMBAT_UID=1000
+ARG WOMBAT_GID=1000
+ENV WOMBAT_UID=${WOMBAT_UID}
+ENV WOMBAT_GID=${WOMBAT_GID}
+
 # Ensure wombat exists, then persist its UID/GID discovered at build time.
 RUN set -eux; \
+	if ! getent group wombat >/dev/null 2>&1; then \
+		addgroup --gid "$WOMBAT_GID" wombat; \
+	fi; \
 	if ! id -u wombat >/dev/null 2>&1; then \
-		addgroup --system wombat; \
-		adduser --system --ingroup wombat wombat; \
+		adduser --uid "$WOMBAT_UID" --gid "$WOMBAT_GID" --disabled-password --gecos "" wombat; \
 	fi
 
 RUN printf '%s\n' '#!/bin/sh' 'set -eu' \
