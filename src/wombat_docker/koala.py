@@ -24,8 +24,8 @@ class Koala:
         self.success_dir = "/var/wombat/heeler/success/"
 
         # UID/GID are provided by container entrypoint; default keeps local behavior.
-        self.wombat_uid = int(os.getenv("WOMBAT_UID", "1000"))
-        self.wombat_gid = int(os.getenv("WOMBAT_GID", "1000"))
+        # self.wombat_uid = int(os.getenv("WOMBAT_UID", "1000"))
+        # self.wombat_gid = int(os.getenv("WOMBAT_GID", "1000"))
 
     def file_reader(self, file_name: str) -> bool:
         try:
