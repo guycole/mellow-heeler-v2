@@ -18,6 +18,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY requirements.txt ./
 RUN $VIRTUAL_ENV/bin/pip install --no-cache-dir -r requirements.txt
 
+COPY koala.py ./
 COPY heeler_app.py ./
 COPY postgres.py ./
 COPY scorer.py ./

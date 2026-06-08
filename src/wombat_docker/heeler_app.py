@@ -10,6 +10,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from koala import Koala
 from scorer import Scorer
 from validator import Validator
 from postgres import PostGres
@@ -41,12 +42,14 @@ class HeelerApp:
         elif self.stunt_box == "validator":
             validator = Validator(self.postgres)
             validator.execute()
+            koala = Koala()
+            koala.execute()
         else:
             logger.error(f"invalid stunt_box option:{self.stunt_box}")
             return
 
 if __name__ == "__main__":
-    # stunt_box options: "scoref" and "validator"
+    # stunt_box options: "koala", "scorer" and "validator"
     score_limit = os.environ.get("limit", -1)
     stunt_box = os.environ.get("stuntbox", "validator")
 
