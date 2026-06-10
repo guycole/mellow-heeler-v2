@@ -9,26 +9,23 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-ARG WOMBAT_UID=1000
-ARG WOMBAT_GID=1000
-ENV WOMBAT_UID=${WOMBAT_UID}
-ENV WOMBAT_GID=${WOMBAT_GID}
+# Require wombat UID/GID to be provided by the Linux build host.
+ARG WOMBAT_UID
+ARG WOMBAT_GID
 
-# Ensure wombat exists, then persist its UID/GID discovered at build time.
 RUN set -eux; \
-	if ! getent group wombat >/dev/null 2>&1; then \
-		addgroup --gid "$WOMBAT_GID" wombat; \
-	fi; \
-	if ! id -u wombat >/dev/null 2>&1; then \
-		adduser --uid "$WOMBAT_UID" --gid "$WOMBAT_GID" --disabled-password --gecos "" wombat; \
-	fi
+	test -n "${WOMBAT_UID}"; \
+	test -n "${WOMBAT_GID}"
 
 RUN printf '%s\n' '#!/bin/sh' 'set -eu' \
-	'uid="$(id -u wombat)"' \
-	'gid="$(id -g wombat)"' \
+	'uid="${WOMBAT_UID:?WOMBAT_UID is required}"' \
+	'gid="${WOMBAT_GID:?WOMBAT_GID is required}"' \
 	'printf "WOMBAT_UID=%s\nWOMBAT_GID=%s\n" "$uid" "$gid" > /app/wombat_env.env' \
 	> /usr/local/bin/collect-wombat-ids.sh \
 	&& chmod +x /usr/local/bin/collect-wombat-ids.sh
+
+ENV WOMBAT_UID=${WOMBAT_UID}
+ENV WOMBAT_GID=${WOMBAT_GID}
 
 RUN /usr/local/bin/collect-wombat-ids.sh
 
