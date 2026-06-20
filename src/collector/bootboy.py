@@ -49,6 +49,7 @@ class BootBoy:
             "receiver": {
                 "antenna": receiver.get("antenna", "xxx"),
                 "receiver_id": receiver.get("id", "xxx"),
+                "task": receiver.get("task", "xxx"),
                 "type": receiver.get("type", "xxx"),
             },
             "freshDir": "/var/wombat/fresh/heeler",
