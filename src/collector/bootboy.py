@@ -69,27 +69,9 @@ class BootBoy:
 
     def crontab(self) -> None:
         import subprocess
-        crontab_entry = "*/10 * * * * /home/wombat/Documents/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1"
+        crontab_entry = "*/10 * * * * /home/wombat/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1"
 
-        try:
-            # Always operate on the 'wombat' user's crontab
-            result = subprocess.run(["crontab", "-u", "wombat", "-l"], capture_output=True, text=True)
-            if result.returncode == 0:
-                current_crontab = result.stdout.splitlines()
-            else:
-                current_crontab = []
-        except Exception as e:
-            print(f"Error reading wombat's crontab: {e}")
-            return
-
-        # Check if entry already exists
-        if any(crontab_entry in line for line in current_crontab):
-            print("Crontab entry already exists for wombat.")
-            return
-
-        # Add the new entry
-        current_crontab.append(crontab_entry)
-        new_crontab = "\n".join(current_crontab) + "\n"
+        new_crontab = crontab_entry + "\n"
         try:
             proc = subprocess.run(["crontab", "-u", "wombat", "-"], input=new_crontab, text=True)
             if proc.returncode == 0:
@@ -109,7 +91,7 @@ class BootBoy:
 #
 if __name__ == "__main__":
     target = socket.gethostname()
-    target = "pi3b"
+#    target = "pi3b"
 
     bb = BootBoy()
     bb.execute(target)
