@@ -48,25 +48,23 @@ class LoadLog(Base):
     epoch_seconds = Column(BigInteger)
     file_name = Column(String)
     file_time = Column(DateTime)
+    file_type = Column(String)
+    host_name = Column(String)
     load_time = Column(DateTime)
-    mode = Column(String)
     obs_quantity = Column(Integer)
-    platform = Column(String)
-    project = Column(String)
+
 
     def __init__(self, args: dict[str, any]):
         self.epoch_seconds = args["epoch_seconds"]
         self.file_name = args["file_name"]
         self.file_time = args["file_time"]
+        self.file_type = args["file_type"]
+        self.host_name = args["host_name"]
         self.load_time = args.get("load_time", datetime.now())
-        self.mode = args["mode"]
         self.obs_quantity = args["obs_quantity"]
-        self.platform = args["platform"]
-        self.project = args["project"]
-
+       
     def __repr__(self):
-        return f"load_log({self.file_name} {self.file_time} {self.platform})"
-
+        return f"load_log({self.file_name} {self.file_time} {self.file_type} {self.host_name})"
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***
