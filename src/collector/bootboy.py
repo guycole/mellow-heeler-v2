@@ -16,7 +16,7 @@ from yaml.loader import SafeLoader
 
 class BootBoy:
 
-    def configuration(self, target: str) -> dict[str, any]
+    def configuration(self, target: str) -> dict[str, any]:
         print(f"BootBoy: configuring {target}")
 
         # Build the path to the admin JSON file
