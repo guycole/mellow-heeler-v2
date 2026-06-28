@@ -29,7 +29,7 @@ class Collector:
         self.gps_enable = configuration["gpsEnable"]
 
         self.host_name = configuration['equipment']["hostName"]
-        self.host_type = configuration['equipment']["type"]
+        self.host_type = configuration['equipment']["hostType"]
 
         self.altitude = configuration["geoLoc"]["altitude"]
         self.latitude = configuration["geoLoc"]["latitude"]
@@ -37,7 +37,7 @@ class Collector:
         self.site_name = configuration["geoLoc"]["siteName"]
 
         self.antenna = configuration["receiver"]["antenna"]
-        self.receiver_id = configuration["receiver"]["receiver_id"]
+        self.receiver_id = configuration["receiver"]["receiverId"]
         self.receiver_type = configuration["receiver"]["type"]
 
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
@@ -77,10 +77,10 @@ class Collector:
         results = {
             "equipment": {
                 "antenna": self.antenna,  
-                "receiver_id": self.receiver_id,
-                "receiver_type": self.receiver_type,
-                "platform": self.host_type,
-                "hostName": self.host_name  
+                "receiverId": self.receiver_id,
+                "receiverType": self.receiver_type,
+                "hostName": self.host_name,
+                "hostType": self.host_type,
             },
             "geoLoc": {
                 "altitude": self.altitude,

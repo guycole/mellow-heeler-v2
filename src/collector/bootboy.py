@@ -41,12 +41,12 @@ class BootBoy:
             "crateName": crate_name,
             "equipment": {
                 "hostName": host_name,
-                "type": host_type,
+                "hostType": host_type,
             },
             "receiver": {
                 "antenna": receiver.get("antenna", "xxx"),
                 "mode": mode,
-                "receiver_id": receiver.get("id", "xxx"),
+                "receiverId": receiver.get("id", "xxx"),
                 "task": receiver.get("task", "xxx"),
                 "type": receiver.get("type", "xxx"),
             },
