@@ -5,13 +5,9 @@
 # Author: G.S. Cole (guycole at gmail dot com)
 #
 
-import datetime
 import json
 import socket
 import sys
-import time
-import uuid
-import zoneinfo
 
 from parser import Parser
 
@@ -20,7 +16,7 @@ from yaml.loader import SafeLoader
 
 class BootBoy:
 
-    def configuration(self, target: str) -> None:
+    def configuration(self, target: str) -> dict[str, any]
         print(f"BootBoy: configuring {target}")
 
         # Build the path to the admin JSON file
@@ -35,28 +31,32 @@ class BootBoy:
 
         # Compose new config dict for YAML output
         receiver = config_data.get("receiver", {})
-        geoLoc = config_data.get("geoLoc", {})
-        crateName = config_data.get("crateName", "xxx")
-        hostName = config_data.get("hostName", target)
-        type_val = config_data.get("type", "xxx")
+        geo_loc = config_data.get("geoLoc", {})
+        crate_name = config_data.get("crateName", "xxx")
+        host_name = config_data.get("hostName", target)
+        host_type = config_data.get("type", "xxx")
+        mode = "iwlist"
 
         yaml_config = {
-            "crateName": crateName,
+            "crateName": crate_name,
             "equipment": {
-                "hostName": hostName,
-                "type": type_val,
+                "hostName": host_name,
+                "type": host_type,
             },
             "receiver": {
                 "antenna": receiver.get("antenna", "xxx"),
+                "mode": mode,
                 "receiver_id": receiver.get("id", "xxx"),
                 "task": receiver.get("task", "xxx"),
                 "type": receiver.get("type", "xxx"),
             },
             "freshDir": "/var/wombat/fresh/heeler",
-            "geoLoc": geoLoc,
+            "geoLoc": geo_loc,
             "gpsEnable": False,
-            "scanFile": "/tmp/iwlist.scan",
         }
+
+        if mode == "iwlist":
+            yaml_config["scanFile"] = "/tmp/iwlist.scan"
 
         # Write to config.yaml in the current directory
         try:
@@ -67,9 +67,13 @@ class BootBoy:
             print(f"Error writing config.yaml: {e}")
             sys.exit(1)
 
+        return {
+            "receiver_task": receiver.get("task", "xxx"),
+        }
+   
     def crontab(self) -> None:
         import subprocess
-        crontab_entry = "*/10 * * * * /home/wombat/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1"
+        crontab_entry = "*/10 * * * * $HOME/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1"
 
         new_crontab = crontab_entry + "\n"
         try:
