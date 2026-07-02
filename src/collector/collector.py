@@ -7,6 +7,7 @@
 
 import datetime
 import json
+import logging
 import socket
 import sys
 import time
@@ -18,6 +19,9 @@ from parser import Parser
 import yaml
 from yaml.loader import SafeLoader
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger("heeler")
+
 class Collector:
     def __init__(self, args: dict[str, any]):
         self.crate_name = args["crateName"]
@@ -25,7 +29,7 @@ class Collector:
         self.gps_enable = configuration["gpsEnable"]
 
         self.host_name = configuration['equipment']["hostName"]
-        self.host_type = configuration['equipment']["type"]
+        self.host_type = configuration['equipment']["hostType"]
 
         self.altitude = configuration["geoLoc"]["altitude"]
         self.latitude = configuration["geoLoc"]["latitude"]
@@ -33,7 +37,7 @@ class Collector:
         self.site_name = configuration["geoLoc"]["siteName"]
 
         self.antenna = configuration["receiver"]["antenna"]
-        self.receiver_id = configuration["receiver"]["receiver_id"]
+        self.receiver_id = configuration["receiver"]["receiverId"]
         self.receiver_type = configuration["receiver"]["type"]
 
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
@@ -42,20 +46,20 @@ class Collector:
                 with open(dest_file, "w") as out_file:
                     out_file.writelines(in_file.readlines())
         except Exception as error:
-            print(error)
+            logger.error(error)
 
     def json_file_writer(self, file_name: str, json_data: dict[str, any]) -> None:
         try:
             with open(file_name, "w") as out_file:
                 json.dump(json_data, out_file, indent=4)
         except Exception as error:
-            print(error)
+            logger.error(error)
 
     def execute(self, file_name: str) -> None:
-        print(f"collector reading: {file_name}")
+        logger.info(f"collector reading: {file_name}")
 
         base_file_name = str(uuid.uuid4())
-        print(f"base filename: {base_file_name}")
+        logger.info(f"base filename: {base_file_name}")
 
         outfile_json = f"{self.fresh_dir}/{base_file_name}.json"
         outfile_raw = f"{self.fresh_dir}/{base_file_name}.raw"
@@ -73,10 +77,10 @@ class Collector:
         results = {
             "equipment": {
                 "antenna": self.antenna,  
-                "receiver_id": self.receiver_id,
-                "receiver_type": self.receiver_type,
-                "platform": self.host_type,
-                "hostName": self.host_name  
+                "receiverId": self.receiver_id,
+                "receiverType": self.receiver_type,
+                "hostName": self.host_name,
+                "hostType": self.host_type,
             },
             "geoLoc": {
                 "altitude": self.altitude,

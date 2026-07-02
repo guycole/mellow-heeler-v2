@@ -5,13 +5,9 @@
 # Author: G.S. Cole (guycole at gmail dot com)
 #
 
-import datetime
 import json
 import socket
 import sys
-import time
-import uuid
-import zoneinfo
 
 from parser import Parser
 
@@ -20,7 +16,7 @@ from yaml.loader import SafeLoader
 
 class BootBoy:
 
-    def configuration(self, target: str) -> None:
+    def configuration(self, target: str) -> dict[str, any]:
         print(f"BootBoy: configuring {target}")
 
         # Build the path to the admin JSON file
@@ -35,28 +31,32 @@ class BootBoy:
 
         # Compose new config dict for YAML output
         receiver = config_data.get("receiver", {})
-        geoLoc = config_data.get("geoLoc", {})
-        crateName = config_data.get("crateName", "xxx")
-        hostName = config_data.get("hostName", target)
-        type_val = config_data.get("type", "xxx")
+        geo_loc = config_data.get("geoLoc", {})
+        crate_name = config_data.get("crateName", "xxx")
+        host_name = config_data.get("hostName", target)
+        host_type = config_data.get("type", "xxx")
+        mode = "iwlist"
 
         yaml_config = {
-            "crateName": crateName,
+            "crateName": crate_name,
             "equipment": {
-                "hostName": hostName,
-                "type": type_val,
+                "hostName": host_name,
+                "hostType": host_type,
             },
             "receiver": {
                 "antenna": receiver.get("antenna", "xxx"),
-                "receiver_id": receiver.get("id", "xxx"),
+                "mode": mode,
+                "receiverId": receiver.get("id", "xxx"),
                 "task": receiver.get("task", "xxx"),
                 "type": receiver.get("type", "xxx"),
             },
             "freshDir": "/var/wombat/fresh/heeler",
-            "geoLoc": geoLoc,
+            "geoLoc": geo_loc,
             "gpsEnable": False,
-            "scanFile": "/tmp/iwlist.scan",
         }
+
+        if mode == "iwlist":
+            yaml_config["scanFile"] = "/tmp/iwlist.scan"
 
         # Write to config.yaml in the current directory
         try:
@@ -67,29 +67,15 @@ class BootBoy:
             print(f"Error writing config.yaml: {e}")
             sys.exit(1)
 
+        return {
+            "receiver_task": receiver.get("task", "xxx"),
+        }
+   
     def crontab(self) -> None:
         import subprocess
-        crontab_entry = "*/10 * * * * /home/wombat/Documents/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1"
+        crontab_entry = "*/10 * * * * $HOME/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1"
 
-        try:
-            # Always operate on the 'wombat' user's crontab
-            result = subprocess.run(["crontab", "-u", "wombat", "-l"], capture_output=True, text=True)
-            if result.returncode == 0:
-                current_crontab = result.stdout.splitlines()
-            else:
-                current_crontab = []
-        except Exception as e:
-            print(f"Error reading wombat's crontab: {e}")
-            return
-
-        # Check if entry already exists
-        if any(crontab_entry in line for line in current_crontab):
-            print("Crontab entry already exists for wombat.")
-            return
-
-        # Add the new entry
-        current_crontab.append(crontab_entry)
-        new_crontab = "\n".join(current_crontab) + "\n"
+        new_crontab = crontab_entry + "\n"
         try:
             proc = subprocess.run(["crontab", "-u", "wombat", "-"], input=new_crontab, text=True)
             if proc.returncode == 0:
@@ -109,7 +95,7 @@ class BootBoy:
 #
 if __name__ == "__main__":
     target = socket.gethostname()
-    target = "pi3b"
+#    target = "pi3b"
 
     bb = BootBoy()
     bb.execute(target)
