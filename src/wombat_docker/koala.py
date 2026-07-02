@@ -19,7 +19,7 @@ class Koala:
         self.koala_dir = "/mnt/wombat/heeler/koala"
         self.success_dir = "/mnt/wombat/heeler/success/"
 
-        # path for mac development
+        # path for local development
         # self.koala_dir = "/var/wombat/heeler/koala"
         # self.success_dir = "/var/wombat/heeler/success/"
 
@@ -47,10 +47,10 @@ class Koala:
 
         return True
 
-    def file_processor(self, file_name: str) -> None:
+    def file_processor(self, file_name: str) -> dict[str, any]:
         if not self.file_reader(file_name):
             logger.warning(f"file read failed for {file_name}")
-            return
+            return {}
         
         epochSeconds = self.raw_buffer.get("timeStamp", {}).get("epochSeconds", 0)
         
@@ -65,9 +65,7 @@ class Koala:
             "wifi": self.raw_buffer.get("observations", []),
         }
 
-        out_file_name = f"{self.koala_dir}/{epochSeconds}.koala"
-        self.file_writer(out_file_name, result)
-        os.chown(out_file_name, self.wombat_uid, self.wombat_gid)
+        return result
 
     def execute(self) -> None:
         logger.info("koala execute")
@@ -77,9 +75,22 @@ class Koala:
         targets = [ff for ff in os.listdir(".") if ff.endswith(".json")]
         logger.info(f"{len(targets)} files noted")
 
+        # only process the most recent 
+        candidates = {}
+        max_list_size = 5
         for target in targets:
-            logger.info(f"target:{target}")
-            self.file_processor(target)
+            candidate = self.file_processor(target)
+            if len(candidate) > 0:
+                key = f"{candidate['epochSeconds']}.{candidate['hostName']}"
+                candidates[key] = candidate
+
+        winner = None
+        for key in sorted(candidates):
+            winner = candidates[key]
+
+        out_file_name = f"{self.koala_dir}/{winner['epochSeconds']}.{winner['hostName']}"
+        self.file_writer(out_file_name, winner)
+        os.chown(out_file_name, self.wombat_uid, self.wombat_gid)
 
 if __name__ == "__main__":
     koala = Koala()
