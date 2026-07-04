@@ -8,7 +8,7 @@
 PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #
 hostname=$(hostname)
-logger -p local3.info "bootboy $hostname"
+logger -p local3.info "bootboy heeler $hostname"
 #
 WORK_DIR="/home/wombat/github/mellow-heeler-v2/src/collector"
 #
