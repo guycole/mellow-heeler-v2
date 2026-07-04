@@ -9,6 +9,9 @@
 #
 PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #
+hostname=$(hostname)
+logger -p local3.info "collector $hostname"
+#
 WORK_DIR="/home/wombat/github/mellow-heeler-v2/src/collector"
 #
 echo "start collector"

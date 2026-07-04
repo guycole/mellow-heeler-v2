@@ -7,6 +7,9 @@
 #
 PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #
+hostname=$(hostname)
+logger -p local3.info "bootboy $hostname"
+#
 WORK_DIR="/home/wombat/github/mellow-heeler-v2/src/collector"
 #
 echo "start bootboy"
