@@ -20,17 +20,26 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
 ## Sample JSON output
 ```
 {
+    "equipment": {
+        "antenna": "whip",
+        "receiverId": 2,
+        "receiverType": "ac-1300",
+        "hostName": "pi3b",
+        "hostType": "rpi3"
+    },
     "geoLoc": {
         "altitude": MSL in meters
         "latitude": +north decimal degress
         "longitude": +east decimal degrees
         "site": site name
     },
-    "epochSeconds": collection time in seconds since epoch
+    "timeStamp": {
+        "epochSeconds": collection time in seconds since epoch
+        "iso8601": epochSeconds as a ISO861 string
+    },
+    "crate": "wombat04",
     "fileName": file name
-    "iso8601": epochSeconds as a ISO861 string
     "mode": collection application (currently only "iwlist")
-    "platform": collection host name
     "project": source project (currently "heeler-v2")
     "version": schema version (currently 1)
     "observations": [
