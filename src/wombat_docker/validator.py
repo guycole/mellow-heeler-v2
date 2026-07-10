@@ -75,7 +75,7 @@ class Validator:
 
                 print(load_log)
 
-                #self.postgres.load_log_insert(load_log)
+                # self.postgres.load_log_insert(load_log)
 
                 daily_score = {
                     "crate_name": self.crate_name,
@@ -87,7 +87,7 @@ class Validator:
 
                 print(daily_score)
 
-                #self.postgres.daily_score_insert_or_update(daily_score)
+                # self.postgres.daily_score_insert_or_update(daily_score)
 
                 return True
             else:

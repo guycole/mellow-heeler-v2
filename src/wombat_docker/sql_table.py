@@ -68,7 +68,7 @@ class LoadLog(Base):
         self.site_name = args["site_name"]
 
     def __repr__(self):
-        return f"load_log({self.file_name} {self.file_time} {self.file_type} {self.host_name})"
+        return f"load_log({self.file_name} {self.obs_time} {self.file_type} {self.host_name})"
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***
