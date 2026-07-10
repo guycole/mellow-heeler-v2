@@ -22,11 +22,7 @@ class HeelerApp:
     def __init__(self, stunt_box: str):
         self.stunt_box = stunt_box
 
-        # wombat docker
-        self.db_conn = "postgresql+psycopg2://heeler_client:batabat@172.17.0.1:5432/heeler"
-
-        # mac development
-        # self.db_conn = "postgresql+psycopg2://heeler_client:batabat@localhost:5432/heeler"
+        self.db_conn = os.environ.get("DB_CONN", "postgresql+psycopg2://heeler_client:batabat@localhost:5432/heeler")
 
         db_engine = create_engine(self.db_conn, echo=False)
         self.postgres = PostGres(sessionmaker(bind=db_engine, expire_on_commit=False))
