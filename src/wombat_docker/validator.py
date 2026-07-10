@@ -57,6 +57,7 @@ class Validator:
                 return False
             else:
                 load_log = {
+                    "crate_name": self.crate_name,
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
                     "file_name": test_file_name,                   
                     "file_type": self.raw_buffer["project"],
