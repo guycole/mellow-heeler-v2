@@ -36,20 +36,18 @@ class HeelerApp:
     def execute(self) -> None:
         logger.info(f"heeler execute:{self.stunt_box}")
 
-        if self.stunt_box == "scorer":
-            scorer = Scorer(self.postgres)
-            scorer.scorer(self.score_limit)
+        if self.stunt_box == "koala":
+            koala = Koala()
+            koala.execute()
         elif self.stunt_box == "validator":
             validator = Validator(self.postgres)
             validator.execute()
-            koala = Koala()
-            koala.execute()
         else:
             logger.error(f"invalid stunt_box option:{self.stunt_box}")
             return
 
 if __name__ == "__main__":
-    # stunt_box options: "koala", "scorer" and "validator"
+    # stunt_box options: "koala" and "validator"
     score_limit = os.environ.get("limit", -1)
     stunt_box = os.environ.get("stuntbox", "validator")
 

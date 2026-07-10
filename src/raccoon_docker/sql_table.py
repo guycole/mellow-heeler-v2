@@ -40,8 +40,6 @@ class DailyScore(Base):
         return f"daily_score({self.score_date} {self.host_name})"
 
 class LoadLog(Base):
-    """load_log table definition"""
-
     __tablename__ = "heeler_load_log"
 
     id = Column(Integer, primary_key=True)

@@ -19,15 +19,9 @@ class Validator:
     def __init__(self, postgres: PostGres):
         self.postgres = postgres
 
-        # path from inside docker container
-        self.failure_dir = "/mnt/wombat/failure/"
-        self.fresh_dir = "/mnt/wombat/fresh/heeler"
-        self.success_dir = "/mnt/wombat/heeler/success/"
-
-        # path for mac development
-        # self.failure_dir = "/var/wombat/failure/"
-        # self.fresh_dir = "/var/wombat/fresh/heeler"
-        # self.success_dir = "/var/wombat/heeler/success/"
+        self.failure_dir = os.environ.get("FAILURE_DIR", "/var/wombat/failure")
+        self.fresh_dir = os.environ.get("FRESH_DIR", "/var/wombat/fresh/heeler")
+        self.success_dir = os.environ.get("SUCCESS_DIR", "/var/wombat/heeler/success")
 
         self.failure = 0
         self.success = 0
@@ -74,6 +68,17 @@ class Validator:
                 }
 
                 self.postgres.load_log_insert(load_log)
+
+                daily_score = {
+                    "score_date": datetime.date.today(),
+
+        self.crate_name = args["crate_name"]
+        self.host_name = args["host_name"]
+        self.quantity_file = args["quantity_file"]
+        self.quantity_obs = args["quantity_obs"]
+        self.score_date = args["score_date"]
+
+                }
 
                 return True
         except Exception as error:

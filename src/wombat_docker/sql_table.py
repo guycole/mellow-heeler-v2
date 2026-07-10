@@ -24,20 +24,21 @@ class DailyScore(Base):
     __tablename__ = "heeler_daily_score"
 
     id = Column(Integer, primary_key=True)
+    crate_name = Column(String)
+    host_name = Column(String)
+    quantity_file = Column(Integer)
+    quantity_obs = Column(Integer)
     score_date = Column(Date)
-    file_quantity = Column(Integer)
-    obs_quantity = Column(Integer)
-    platform = Column(String)
 
     def __init__(self, args: dict[str, any]):
+        self.crate_name = args["crate_name"]
+        self.host_name = args["host_name"]
+        self.quantity_file = args["quantity_file"]
+        self.quantity_obs = args["quantity_obs"]
         self.score_date = args["score_date"]
-        self.file_quantity = args["file_quantity"]
-        self.obs_quantity = args["obs_quantity"]
-        self.platform = args["platform"]
 
     def __repr__(self):
-        return f"daily_score({self.score_date} {self.platform})"
-
+        return f"daily_score({self.score_date} {self.host_name})"
 
 class LoadLog(Base):
     """load_log table definition"""
@@ -52,7 +53,6 @@ class LoadLog(Base):
     host_name = Column(String)
     load_time = Column(DateTime)
     obs_quantity = Column(Integer)
-
 
     def __init__(self, args: dict[str, any]):
         self.epoch_seconds = args["epoch_seconds"]

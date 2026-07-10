@@ -1,9 +1,8 @@
 #
 # docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) -t heeler:latest .
 # docker run -v /var/wombat:/mnt/wombat --name heeler heeler:latest
-# docker run -e stuntbox=validate -v /var/wombat:/mnt/wombat --name heeler heeler:latest
-# docker run -e stuntbox=score -e limit=5 --name heeler heeler:latest
-# docker run -e stuntbox=score --name heeler heeler:latest
+# docker run -e stuntbox=validator -v /var/wombat:/mnt/wombat --name heeler heeler:latest
+# docker run -e stuntbox=koala --name heeler heeler:latest
 #
 FROM python:3.11-slim
 

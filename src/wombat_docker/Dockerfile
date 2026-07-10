@@ -1,9 +1,8 @@
 #
 # docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) -t heeler:latest .
 # docker run -v /var/wombat:/mnt/wombat --name heeler heeler:latest
-# docker run -e stuntbox=validate -v /var/wombat:/mnt/wombat --name heeler heeler:latest
-# docker run -e stuntbox=score -e limit=5 --name heeler heeler:latest
-# docker run -e stuntbox=score --name heeler heeler:latest
+# docker run -e stuntbox=validator -v /var/wombat:/mnt/wombat --name heeler heeler:latest
+# docker run -e stuntbox=koala --name heeler heeler:latest
 #
 FROM python:3.11-slim
 
@@ -41,12 +40,15 @@ RUN $VIRTUAL_ENV/bin/pip install --no-cache-dir -r requirements.txt
 COPY koala.py ./
 COPY heeler_app.py ./
 COPY postgres.py ./
-COPY scorer.py ./
 COPY sql_table.py ./
 COPY validator.py ./
 
 RUN printf '%s\n' '#!/bin/sh' 'set -e' '/usr/local/bin/collect-wombat-ids.sh' 'set -a' '[ -f /app/wombat_env.env ] && . /app/wombat_env.env' 'set +a' 'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
 	&& chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENV FAILURE_DIR=/mnt/wombat/failure/
+ENV FRESH_DIR=/mnt/wombat/fresh/heeler
+ENV SUCCESS_DIR=/mnt/wombat/heeler/success/
 
 RUN mkdir -p /mnt/wombat
 ENTRYPOINT ["docker-entrypoint.sh"]

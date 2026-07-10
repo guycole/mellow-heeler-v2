@@ -24,7 +24,6 @@ from sql_table import (
     LoadLog,
 )
 
-
 class PostGres:
     db_engine = None
     Session = None
@@ -41,7 +40,7 @@ class PostGres:
                     select(DailyScore).filter(
                         and_(
                             DailyScore.score_date == candidate.score_date,
-                            DailyScore.platform == candidate.platform,
+                            DailyScore.host_name == candidate.host_name,
                         )
                     )
                 ).first()
@@ -49,15 +48,15 @@ class PostGres:
                 if existing is None:
                     session.add(candidate)
                 else:
-                    existing.file_quantity = candidate.file_quantity
-                    existing.obs_quantity = candidate.obs_quantity
+                    existing.quantity_file += candidate.quantity_file
+                    existing.quantity_obs += candidate.quantity_obs
 
                 session.commit()
         except Exception as error:
             print(error)
 
         return candidate
-
+    
     def load_log_insert(self, args: dict[str, any]) -> LoadLog:
         candidate = LoadLog(args)
 
