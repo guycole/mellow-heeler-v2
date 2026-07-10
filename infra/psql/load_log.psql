@@ -2,25 +2,31 @@
 -- Title: load_log.psql
 -- Description: file load history
 --
+-- crate_name is crateName (from json)
 -- epoch_seconds is from timeStamp.epochSeconds
--- file_name within fresh_dir
--- file_time is from timeStamp.iso8601
--- file_type is from project i.e. slug_v1
+-- file_name is fileName (from json)
+-- file_type is from project i.e. heeler_v2
 -- host_name is from equipment.hostName
 -- load_time is when file was processed
+-- mode is collection mode
 -- obs_quantity is population of observations in file
--- site is from preamble geoLoc.siteName
+-- obs_time is observation time from timeStamp.iso8601
+-- site_name is from preamble geoLoc.siteName
 --
 create table heeler_load_log (
   id            bigserial    primary key,
+  crate_name    varchar(32)  not null,
   epoch_seconds bigint       not null,
   file_name     varchar(48)  unique not null,
-  file_time     timestamp    not null,
   file_type     varchar(48)  not null,
   host_name     varchar(16)  not null,
   load_time     timestamp    not null default CURRENT_TIMESTAMP,
-  obs_quantity  smallint     not null
+  obs_quantity  smallint     not null,
+  obs_time      timestamp    not null,
+  site_name     varchar(48)  not null
 );
 
 grant select, insert, update, delete on heeler_load_log to heeler_client;
 grant usage, select on sequence heeler_load_log_id_seq to heeler_client;
+
+create unique index heeler_load_log on heeler_load_log(crate_name, host_name, epoch_seconds);

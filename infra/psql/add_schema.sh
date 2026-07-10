@@ -12,5 +12,6 @@ export PGHOST=localhost
 export PGPASSWORD=woofwoof
 export PGUSER=heeler_admin
 #
+psql < daily_score.psql
 psql < load_log.psql
 #
