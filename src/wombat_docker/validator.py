@@ -50,14 +50,10 @@ class Validator:
         return True
 
     def load_log_test(self, test_file_name: str) -> bool:
-        print(f"load_log_test for file: {test_file_name}")
         logger.info(f"load_log_test for file: {test_file_name}")
 
         try:
-            print("top top top")
             candidate = self.postgres.load_log_select_by_file_name(test_file_name)
-            print(candidate)
-
             if candidate is None:
                 logger.info(f"processing new file:{test_file_name}")
 
@@ -73,9 +69,7 @@ class Validator:
                     "site_name": self.raw_buffer["geoLoc"]["siteName"],
                 }
 
-                print(load_log)
-
-                # self.postgres.load_log_insert(load_log)
+                self.postgres.load_log_insert(load_log)
 
                 daily_score = {
                     "crate_name": self.raw_buffer["crate"],
@@ -85,9 +79,7 @@ class Validator:
                     "score_date": datetime.date.fromisoformat(self.raw_buffer["timeStamp"]["iso8601"][:10]),
                 }
 
-                print(daily_score)
-
-                # self.postgres.daily_score_insert_or_update(daily_score)
+                self.postgres.daily_score_insert_or_update(daily_score)
 
                 return True
             else:
