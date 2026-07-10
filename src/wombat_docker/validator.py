@@ -70,15 +70,14 @@ class Validator:
                 self.postgres.load_log_insert(load_log)
 
                 daily_score = {
-                    "score_date": datetime.date.today(),
-
-        self.crate_name = args["crate_name"]
-        self.host_name = args["host_name"]
-        self.quantity_file = args["quantity_file"]
-        self.quantity_obs = args["quantity_obs"]
-        self.score_date = args["score_date"]
-
+                    "crate_name": self.crate_name,
+                    "host_name": self.host_name,
+                    "quantity_file": self.quantity_file,
+                    "quantity_obs": self.quantity_obs,
+                    "score_date": datetime.date.fromisoformat(self.raw_buffer["timeStamp"]["iso8601"][:10]),
                 }
+
+                self.postgres.daily_score_insert_or_update(daily_score)
 
                 return True
         except Exception as error:
