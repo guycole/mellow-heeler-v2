@@ -58,12 +58,12 @@ class Validator:
             else:
                 load_log = {
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
-                    "file_name": test_file_name,
-                    "file_time": self.raw_buffer["timeStamp"]["iso8601"],
+                    "file_name": test_file_name,                   
                     "file_type": self.raw_buffer["project"],
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "load_time": datetime.datetime.now(),
                     "obs_quantity": len(self.raw_buffer["observations"]),
+                    "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
                     "site": self.raw_buffer["geoLoc"]["siteName"],
                 }
 
