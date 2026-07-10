@@ -8,7 +8,6 @@
 -- file_type is from project i.e. heeler_v2
 -- host_name is from equipment.hostName
 -- load_time is when file was processed
--- mode is collection mode
 -- obs_quantity is population of observations in file
 -- obs_time is observation time from timeStamp.iso8601
 -- site_name is from preamble geoLoc.siteName

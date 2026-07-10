@@ -32,9 +32,9 @@ class DailyScore(Base):
 
     def __init__(self, args: dict[str, any]):
         self.crate_name = args["crate_name"]
+        self.file_quantity = args["file_quantity"]
         self.host_name = args["host_name"]
-        self.quantity_file = args["quantity_file"]
-        self.quantity_obs = args["quantity_obs"]
+        self.obs_quantity = args["obs_quantity"]
         self.score_date = args["score_date"]
 
     def __repr__(self):
@@ -53,6 +53,7 @@ class LoadLog(Base):
     load_time = Column(DateTime)
     obs_quantity = Column(Integer)
     obs_time = Column(DateTime)
+    site_name = Column(String)
 
     def __init__(self, args: dict[str, any]):
         self.epoch_seconds = args["epoch_seconds"]
@@ -61,7 +62,8 @@ class LoadLog(Base):
         self.host_name = args["host_name"]
         self.load_time = args.get("load_time", datetime.now())
         self.obs_quantity = args["obs_quantity"]
-        self.obs_time = args["obs_time"]\
+        self.obs_time = args["obs_time"]
+        self.site_name = args["site_name"]
 
     def __repr__(self):
         return f"load_log({self.file_name} {self.file_time} {self.file_type} {self.host_name})"

@@ -64,16 +64,16 @@ class Validator:
                     "load_time": datetime.datetime.now(),
                     "obs_quantity": len(self.raw_buffer["observations"]),
                     "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
-                    "site": self.raw_buffer["geoLoc"]["siteName"],
+                    "site_name": self.raw_buffer["geoLoc"]["siteName"],
                 }
 
                 self.postgres.load_log_insert(load_log)
 
                 daily_score = {
                     "crate_name": self.crate_name,
-                    "host_name": self.host_name,
-                    "quantity_file": self.quantity_file,
-                    "quantity_obs": self.quantity_obs,
+                    "file_quantity": 1,
+                    "host_name": self.raw_buffer["equipment"]["hostName"],
+                    "obs_quantity": len(self.raw_buffer["observations"]),
                     "score_date": datetime.date.fromisoformat(self.raw_buffer["timeStamp"]["iso8601"][:10]),
                 }
 
