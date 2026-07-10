@@ -54,7 +54,9 @@ class Validator:
         logger.info(f"load_log_test for file: {test_file_name}")
 
         try:
+            print("top top top")
             candidate = self.postgres.load_log_select_by_file_name(test_file_name)
+            print(candidate)
             if candidate is not None:
                 logger.info(f"skippping already processed:{test_file_name}")
                 return False
