@@ -46,6 +46,7 @@ class LoadLog(Base):
     __tablename__ = "heeler_load_log"
 
     id = Column(Integer, primary_key=True)
+    crate_name = Column(String)
     epoch_seconds = Column(BigInteger)
     file_name = Column(String)
     file_type = Column(String)
@@ -56,6 +57,7 @@ class LoadLog(Base):
     site_name = Column(String)
 
     def __init__(self, args: dict[str, any]):
+        self.crate_name = args["crate_name"]
         self.epoch_seconds = args["epoch_seconds"]
         self.file_name = args["file_name"]
         self.file_type = args["file_type"]
