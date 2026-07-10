@@ -48,8 +48,8 @@ class PostGres:
                 if existing is None:
                     session.add(candidate)
                 else:
-                    existing.quantity_file += candidate.quantity_file
-                    existing.quantity_obs += candidate.quantity_obs
+                    existing.file_quantity += candidate.file_quantity
+                    existing.obs_quantity += candidate.obs_quantity
 
                 session.commit()
         except Exception as error:
