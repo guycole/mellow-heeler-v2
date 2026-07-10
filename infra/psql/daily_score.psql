@@ -25,4 +25,4 @@ create table heeler_daily_score (
 grant select, insert, update, delete on heeler_daily_score to heeler_client;
 grant usage, select on sequence heeler_daily_score_id_seq to heeler_client;
 
-create unique index heeler_daily_score on heeler_daily_score(crate_name, host_name, score_date);
+create unique index heeler_daily_score_ndx on heeler_daily_score(crate_name, host_name, score_date);

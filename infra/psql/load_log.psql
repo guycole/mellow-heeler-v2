@@ -29,4 +29,4 @@ create table heeler_load_log (
 grant select, insert, update, delete on heeler_load_log to heeler_client;
 grant usage, select on sequence heeler_load_log_id_seq to heeler_client;
 
-create unique index heeler_load_log on heeler_load_log(crate_name, host_name, epoch_seconds);
+create unique index heeler_load_log_ndx on heeler_load_log(crate_name, host_name, epoch_seconds);
