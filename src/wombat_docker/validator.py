@@ -50,6 +50,9 @@ class Validator:
         return True
 
     def load_log_test(self, test_file_name: str) -> bool:
+        print(f"load_log_test for file: {test_file_name}")
+        logger.info(f"load_log_test for file: {test_file_name}")
+
         try:
             candidate = self.postgres.load_log_select_by_file_name(test_file_name)
             if candidate is not None:
