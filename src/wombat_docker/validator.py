@@ -57,10 +57,10 @@ class Validator:
             print("top top top")
             candidate = self.postgres.load_log_select_by_file_name(test_file_name)
             print(candidate)
-            if candidate is not None:
-                logger.info(f"skippping already processed:{test_file_name}")
-                return False
-            else:
+
+            if candidate is None:
+                logger.info(f"processing new file:{test_file_name}")
+
                 load_log = {
                     "crate_name": self.crate_name,
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
@@ -90,6 +90,11 @@ class Validator:
                 self.postgres.daily_score_insert_or_update(daily_score)
 
                 return True
+            else:
+                logger.info(f"skippping already processed:{test_file_name}")
+                print("skipping already processed file")
+                return False
+
         except Exception as error:
             logger.error(f"postgres insert failed for {test_file_name}: {error}")        
         
