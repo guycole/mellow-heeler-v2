@@ -25,9 +25,9 @@ class DailyScore(Base):
 
     id = Column(Integer, primary_key=True)
     crate_name = Column(String)
+    file_quantity = Column(Integer)
     host_name = Column(String)
-    quantity_file = Column(Integer)
-    quantity_obs = Column(Integer)
+    obs_quantity = Column(Integer)
     score_date = Column(Date)
 
     def __init__(self, args: dict[str, any]):
