@@ -68,6 +68,8 @@ class Validator:
                     "site_name": self.raw_buffer["geoLoc"]["siteName"],
                 }
 
+                print(load_log)
+
                 self.postgres.load_log_insert(load_log)
 
                 daily_score = {
@@ -77,6 +79,8 @@ class Validator:
                     "obs_quantity": len(self.raw_buffer["observations"]),
                     "score_date": datetime.date.fromisoformat(self.raw_buffer["timeStamp"]["iso8601"][:10]),
                 }
+
+                print(daily_score)
 
                 self.postgres.daily_score_insert_or_update(daily_score)
 
