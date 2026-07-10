@@ -60,15 +60,12 @@ class PostGres:
     def load_log_insert(self, args: dict[str, any]) -> LoadLog:
         candidate = LoadLog(args)
 
-        print(args)
-        print(candidate)
-
-#        try:
-#            with self.Session() as session:
-#                session.add(candidate)
-#                session.commit()
-#        except Exception as error:
-#            print(error)
+        try:
+            with self.Session() as session:
+                session.add(candidate)
+                session.commit()
+        except Exception as error:
+            print(error)
 
         return candidate
 

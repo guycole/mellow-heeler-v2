@@ -62,7 +62,7 @@ class Validator:
                 logger.info(f"processing new file:{test_file_name}")
 
                 load_log = {
-                    "crate_name": self.crate_name,
+                    "crate_name": self.raw_buffer["crate"],
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
                     "file_name": test_file_name,                   
                     "file_type": self.raw_buffer["project"],
@@ -78,7 +78,7 @@ class Validator:
                 # self.postgres.load_log_insert(load_log)
 
                 daily_score = {
-                    "crate_name": self.crate_name,
+                    "crate_name": self.raw_buffer["crate"],
                     "file_quantity": 1,
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "obs_quantity": len(self.raw_buffer["observations"]),
@@ -96,7 +96,7 @@ class Validator:
                 return False
 
         except Exception as error:
-            logger.error(f"postgres insert failed for {test_file_name}: {error}")        
+            logger.error(f"postgres failure {test_file_name}: {error}")        
         
         return False
 
