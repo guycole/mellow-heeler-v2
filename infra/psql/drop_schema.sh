@@ -11,5 +11,8 @@ export PGPASSWORD=woofwoof
 export PGUSER=heeler_admin
 #
 psql $PGDATABASE -c "drop table heeler_daily_score"
+psql $PGDATABASE -c "drop table heeler_observation"
 psql $PGDATABASE -c "drop table heeler_load_log"
+psql $PGDATABASE -c "drop table heeler_geo_loc"
+psql $PGDATABASE -c "drop table heeler_wap"
 #

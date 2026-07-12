@@ -1,0 +1,25 @@
+--
+-- Title: observation.psql
+-- Description: observations
+--
+-- crate_name is crateName (from json)
+-- file_quantity is total daily files
+-- host_name is from equipment.hostName
+-- obs_quantity is total daily observations
+-- score_date is summary date
+--
+create table heeler_observation (
+  id           bigserial    primary key,
+  bssid        varchar(24)  not null,
+  load_log_id  bigint       not null,
+  constraint   load_log_id  foreign key(load_log_id) references heeler_load_log(id),
+  obs_time     timestamp    not null,
+  signal_dbm   smallint     not null,
+  wap_id       bigint       not null,
+  constraint   wap_id       foreign key(wap_id) references heeler_wap(id)
+);
+
+grant select, insert, update, delete on heeler_observation to heeler_client;
+grant usage, select on sequence heeler_observation_id_seq to heeler_client;
+
+create index observation_bssid on heeler_observation(bssid);

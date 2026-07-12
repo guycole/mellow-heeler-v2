@@ -13,5 +13,8 @@ export PGPASSWORD=woofwoof
 export PGUSER=heeler_admin
 #
 psql < daily_score.psql
+psql < geo_loc.psql
 psql < load_log.psql
+psql < wap.psql
+psql < observation.psql
 #
