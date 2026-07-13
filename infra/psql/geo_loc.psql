@@ -13,20 +13,20 @@
 create table heeler_geo_loc (
   id         bigserial    primary key,
   altitude   real         not null,
+  course     real         not null,
   fix_time   timestamp    not null default CURRENT_TIMESTAMP,
   host_name  varchar(16)  not null,
   latitude   real         not null,
   longitude  real         not null,
   site_name  varchar(48)  not null,
-  speed      real         not null,
-  track      real         not null
+  speed      real         not null
 );
 
 grant select, insert, update, delete on heeler_geo_loc to heeler_client;
 grant usage, select on sequence heeler_geo_loc_id_seq to heeler_client;
 
 -- anderson01
-insert into heeler_geo_loc(altitude, fix_time, host_name, latitude, longitude, site_name, speed, track) values(118.6, '2000-1-1', 'stub', 40.4174, -122.2405, 'anderson01', 0, 0);
+insert into heeler_geo_loc(altitude, course, fix_time, host_name, latitude, longitude, site_name, speed) values(118.6, 0, '2000-1-1', 'stub', 40.4174, -122.2405, 'anderson01', 0);
 
 -- vallejo01
-insert into heeler_geo_loc(altitude, fix_time, host_name, latitude, longitude, site_name, speed, track) values(0, '2000-1-1', 'stub', 38.1080, -122.2680, 'vallejo01', 0, 0);
+insert into heeler_geo_loc(altitude, course, fix_time, host_name, latitude, longitude, site_name, speed) values(0, 0, '2000-1-1', 'stub', 38.1080, -122.2680, 'vallejo01', 0);
