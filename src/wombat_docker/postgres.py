@@ -21,6 +21,7 @@ from sqlalchemy import desc
 
 from sql_table import (
     DailyScore,
+    GeoLoc,
     LoadLog,
 )
 
@@ -57,6 +58,12 @@ class PostGres:
 
         return candidate
     
+    def geo_loc_select_by_site(self, site_name: str) -> List[GeoLoc]:
+        statement = select(GeoLoc).filter_by(site_name=site_name).order_by(GeoLoc.fix_time)
+
+        with self.Session() as session:
+            return session.scalars(statement).all()
+
     def load_log_insert(self, args: dict[str, any]) -> LoadLog:
         candidate = LoadLog(args)
 

@@ -40,6 +40,32 @@ class DailyScore(Base):
     def __repr__(self):
         return f"daily_score({self.score_date} {self.host_name})"
 
+class GeoLoc(Base):
+    __tablename__ = "heeler_geo_loc"
+
+    id = Column(Integer, primary_key=True)
+    altitude = Column(Float)
+    course = Column(Float)
+    fix_time = Column(DateTime)
+    host_name = Column(String)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    site_name = Column(String)
+    speed = Column(Float)
+   
+    def __init__(self, args: dict[str, any]):
+        self.altitude = args["altitude"]
+        self.course = args["course"]
+        self.fix_time = args["fix_time"]
+        self.host_name = args["host_name"]
+        self.latitude = args["latitude"]
+        self.longitude = args["longitude"]
+        self.site_name = args["site_name"]
+        self.speed = args["speed"]
+
+    def __repr__(self):
+        return f"geo_loc({self.site_name} {self.host_name})"
+
 class LoadLog(Base):
     """load_log table definition"""
 
