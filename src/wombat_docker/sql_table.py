@@ -76,6 +76,7 @@ class LoadLog(Base):
     epoch_seconds = Column(BigInteger)
     file_name = Column(String)
     file_type = Column(String)
+    geo_loc_id = Column(BigInteger)
     host_name = Column(String)
     load_time = Column(DateTime)
     obs_quantity = Column(Integer)
@@ -87,6 +88,7 @@ class LoadLog(Base):
         self.epoch_seconds = args["epoch_seconds"]
         self.file_name = args["file_name"]
         self.file_type = args["file_type"]
+        self.geo_loc_id = args["geo_loc_id"]
         self.host_name = args["host_name"]
         self.load_time = args.get("load_time", datetime.now())
         self.obs_quantity = args["obs_quantity"]
