@@ -40,17 +40,12 @@ RUN $VIRTUAL_ENV/bin/pip install --no-cache-dir -r requirements.txt
 COPY koala.py ./
 COPY heeler_app.py ./
 COPY postgres.py ./
+COPY scorer.py ./
 COPY sql_table.py ./
 COPY validator.py ./
 
 RUN printf '%s\n' '#!/bin/sh' 'set -e' '/usr/local/bin/collect-wombat-ids.sh' 'set -a' '[ -f /app/wombat_env.env ] && . /app/wombat_env.env' 'set +a' 'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
 	&& chmod +x /usr/local/bin/docker-entrypoint.sh
-
-ENV FAILURE_DIR=/mnt/wombat/failure/
-ENV FRESH_DIR=/mnt/wombat/fresh/heeler
-ENV SUCCESS_DIR=/mnt/wombat/heeler/success/
-
-ENV DB_CONN=postgresql+psycopg2://heeler_client:batabat@172.17.0.1:5432/heeler
 
 RUN mkdir -p /mnt/wombat
 ENTRYPOINT ["docker-entrypoint.sh"]

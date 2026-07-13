@@ -1,0 +1,19 @@
+--
+-- Title: wap.psql
+-- Description: all the wap
+--
+create table heeler_wap (
+  id             bigserial     primary key,
+  bssid          varchar(24)   not null,
+  capability     varchar(64)   not null,
+  cipher         varchar(64)   not null,
+  frequency_mhz  smallint      not null,
+  ssid           varchar(132)  not null,
+  version        int           not null
+);
+
+grant select, insert, update, delete on heeler_wap to heeler_client;
+grant usage, select on sequence heeler_wap_id_seq to heeler_client;
+
+create index wap_ssid on heeler_wap(ssid);
+create unique index wap_bssid_version on heeler_wap(bssid, version);

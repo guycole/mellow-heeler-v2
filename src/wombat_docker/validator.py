@@ -19,15 +19,9 @@ class Validator:
     def __init__(self, postgres: PostGres):
         self.postgres = postgres
 
-        # path from inside docker container
-        self.failure_dir = "/mnt/wombat/failure/"
-        self.fresh_dir = "/mnt/wombat/fresh/heeler"
-        self.success_dir = "/mnt/wombat/heeler/success/"
-
-        # path for mac development
-        # self.failure_dir = "/var/wombat/failure/"
-        # self.fresh_dir = "/var/wombat/fresh/heeler"
-        # self.success_dir = "/var/wombat/heeler/success/"
+        self.failure_dir = os.environ.get("FAILURE_DIR", "/var/wombat/failure")
+        self.fresh_dir = os.environ.get("FRESH_DIR", "/var/wombat/fresh/heeler")
+        self.success_dir = os.environ.get("SUCCESS_DIR", "/var/wombat/heeler/success")
 
         self.failure = 0
         self.success = 0
@@ -56,28 +50,45 @@ class Validator:
         return True
 
     def load_log_test(self, test_file_name: str) -> bool:
+        logger.info(f"load_log_test for file: {test_file_name}")
+
         try:
             candidate = self.postgres.load_log_select_by_file_name(test_file_name)
-            if candidate is not None:
-                logger.info(f"skippping already processed:{test_file_name}")
-                return False
-            else:
+            if candidate is None:
+                logger.info(f"processing new file:{test_file_name}")
+
                 load_log = {
+                    "crate_name": self.raw_buffer["crate"],
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
-                    "file_name": test_file_name,
-                    "file_time": self.raw_buffer["timeStamp"]["iso8601"],
+                    "file_name": test_file_name,                   
                     "file_type": self.raw_buffer["project"],
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "load_time": datetime.datetime.now(),
                     "obs_quantity": len(self.raw_buffer["observations"]),
-                    "site": self.raw_buffer["geoLoc"]["siteName"],
+                    "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
+                    "site_name": self.raw_buffer["geoLoc"]["siteName"],
                 }
 
                 self.postgres.load_log_insert(load_log)
 
+                daily_score = {
+                    "crate_name": self.raw_buffer["crate"],
+                    "file_quantity": 1,
+                    "host_name": self.raw_buffer["equipment"]["hostName"],
+                    "obs_quantity": len(self.raw_buffer["observations"]),
+                    "score_date": datetime.date.fromisoformat(self.raw_buffer["timeStamp"]["iso8601"][:10]),
+                }
+
+                self.postgres.daily_score_insert_or_update(daily_score)
+
                 return True
+            else:
+                logger.info(f"skippping already processed:{test_file_name}")
+                print("skipping already processed file")
+                return False
+
         except Exception as error:
-            logger.error(f"postgres insert failed for {test_file_name}: {error}")        
+            logger.error(f"postgres failure {test_file_name}: {error}")        
         
         return False
 

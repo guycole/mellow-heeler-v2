@@ -21,7 +21,10 @@ from sqlalchemy import desc
 
 from sql_table import (
     DailyScore,
+    GeoLoc,
     LoadLog,
+    Observation,
+    Wap
 )
 
 class PostGres:
@@ -56,7 +59,13 @@ class PostGres:
             print(error)
 
         return candidate
-    
+
+    def geo_loc_select_by_site(self, site_name: str) -> List[GeoLoc]:
+        statement = select(GeoLoc).filter_by(site_name=site_name).order_by(GeoLoc.fix_time)
+
+        with self.Session() as session:
+            return session.scalars(statement).all()
+
     def load_log_insert(self, args: dict[str, any]) -> LoadLog:
         candidate = LoadLog(args)
 
@@ -89,6 +98,49 @@ class PostGres:
                 select(LoadLog).filter_by(file_name=file_name)
             ).first()
 
+    def observation_insert(self, args: dict[str, any]) -> Observation:
+        candidate = Observation(args)
+
+        try:
+            with self.Session() as session:
+                session.add(candidate)
+                session.commit()
+        except Exception as error:
+            print(error)
+
+        return candidate
+
+    def wap_insert(self, args: dict[str, any]) -> Wap:
+        candidate = Wap(args)
+
+        try:
+            with self.Session() as session:
+                session.add(candidate)
+                session.commit()
+        except Exception as error:
+            print(error)
+
+        return candidate
+
+    def wap_select(self, wap: dict[str, any]) -> list[Wap]:
+        statement = select(Wap).filter(
+            and_(
+                Wap.bssid == wap["bssid"].lower(),
+                Wap.ssid == wap["ssid"],
+                Wap.capability == wap["capability"],
+                Wap.cipher == wap["cipher"],
+                Wap.frequency_mhz == wap["frequency_mhz"],
+            )
+        ).order_by(Wap.version)
+
+        with self.Session() as session:
+            return session.scalars(statement).all()
+
+    def wap_select_by_bssid(self, bssid: str) -> list[Wap]:
+        statement = select(Wap).filter_by(bssid=bssid.lower()).order_by(Wap.version)
+
+        with self.Session() as session:
+            return session.scalars(statement).all()
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***
