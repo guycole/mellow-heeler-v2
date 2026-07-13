@@ -42,7 +42,6 @@ class HeelerApp:
 
 if __name__ == "__main__":
     # stunt_box options: "koala" and "validator"
-    score_limit = os.environ.get("limit", -1)
     stunt_box = os.environ.get("stuntbox", "validator")
 
     app = HeelerApp(stunt_box)

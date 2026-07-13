@@ -57,11 +57,17 @@ class Validator:
             if candidate is None:
                 logger.info(f"processing new file:{test_file_name}")
 
+                geo_loc = self.postgres.geo_loc_select_by_site(self.raw_buffer["geoLoc"]["siteName"])
+                if len(geo_loc) == 0:
+                    print("must insert geo_loc for site:", self.raw_buffer["geoLoc"]["siteName"])
+                    return False
+
                 load_log = {
                     "crate_name": self.raw_buffer["crate"],
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
                     "file_name": test_file_name,                   
                     "file_type": self.raw_buffer["project"],
+                    "geo_loc_id": geo_loc[0].id,
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "load_time": datetime.datetime.now(),
                     "obs_quantity": len(self.raw_buffer["observations"]),
