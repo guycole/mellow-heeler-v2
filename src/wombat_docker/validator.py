@@ -119,7 +119,7 @@ class Validator:
             self.file_failure(file_name2)
             return
         
-        if self.raw_buffer["version"] == 1 and self.raw_buffer["project"] == "heeler-v2":
+        if self.raw_buffer["version"] == 1 and self.raw_buffer["job"]["project"] == "heeler-v2":
             pass
         else:
             logger.warning(f"invalid version or project for {test_file_name}")
