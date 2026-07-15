@@ -66,13 +66,14 @@ class Validator:
                     "crate_name": self.raw_buffer["crate"],
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
                     "file_name": test_file_name,                   
-                    "file_type": self.raw_buffer["project"],
                     "geo_loc_id": geo_loc[0].id,
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "load_time": datetime.datetime.now(),
+                    "mode": self.raw_buffer["job"]["mode"],
                     "obs_quantity": len(self.raw_buffer["observations"]),
                     "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
                     "site_name": self.raw_buffer["geoLoc"]["siteName"],
+                    "task": self.raw_buffer["job"]["task"],
                 }
 
                 self.postgres.load_log_insert(load_log)
@@ -117,8 +118,8 @@ class Validator:
             self.file_failure(file_name1)
             self.file_failure(file_name2)
             return
-        
-        if self.raw_buffer["version"] == 1 and self.raw_buffer["project"] == "heeler-v2":
+
+        if self.raw_buffer["version"] == 1 and self.raw_buffer["job"]["project"] == "heeler-v2":
             pass
         else:
             logger.warning(f"invalid version or project for {test_file_name}")

@@ -38,6 +38,7 @@ class Collector:
 
         self.antenna = configuration["receiver"]["antenna"]
         self.receiver_id = configuration["receiver"]["receiverId"]
+        self.receiver_task = configuration["receiver"]["task"]
         self.receiver_type = configuration["receiver"]["type"]
 
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
@@ -74,6 +75,7 @@ class Collector:
             epoch_seconds, tz=zoneinfo.ZoneInfo("UTC")
         )
 
+
         results = {
             "equipment": {
                 "antenna": self.antenna,  
@@ -86,18 +88,21 @@ class Collector:
                 "altitude": self.altitude,
                 "latitude": self.latitude,
                 "longitude": self.longitude,
-                "siteName": self.site_name
+                "siteName": self.site_name,
+            },
+            "job": {
+                "mode": "iwlist",
+                "project": "heeler-v2",
+                "task": "heeler-v2-iwlist",
             },
             "timeStamp": {
                 "epochSeconds": epoch_seconds,
-                "iso8601": dt_object_utc.isoformat()
+                "iso8601": dt_object_utc.isoformat(),
             },
             "crate": self.crate_name,
             "fileName": f"{base_file_name}.json",
-            "mode": "iwlist",
-            "project": "heeler-v2",
             "version": 1,
-            "observations": observations
+            "observations": observations,
         }
 
         self.json_file_writer(outfile_json, results)
