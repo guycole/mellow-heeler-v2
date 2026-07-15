@@ -1,7 +1,8 @@
+crateNam
 crateName: wombat04
 equipment:
   hostName: pi3b
-  type: rpi3
+  hostType: rpi3
 freshDir: /var/wombat/fresh/heeler
 geoLoc:
   altitude: 0
@@ -11,6 +12,7 @@ geoLoc:
 gpsEnable: false
 receiver:
   antenna: whip
-  receiver_id: 2
+  receiverId: 2
+  task: heeler-v2-iwlist
   type: ac-1300
 scanFile: /tmp/iwlist.scan
