@@ -73,7 +73,7 @@ class Validator:
                     "obs_quantity": len(self.raw_buffer["observations"]),
                     "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
                     "site_name": self.raw_buffer["geoLoc"]["siteName"],
-                    "task": self.raw_buffer["receiver"]["task"],
+                    "task": self.raw_buffer["job"]["task"],
                 }
 
                 self.postgres.load_log_insert(load_log)
@@ -118,8 +118,7 @@ class Validator:
             self.file_failure(file_name1)
             self.file_failure(file_name2)
             return
-        
-        print(f"raw_buffer: {self.raw_buffer}")
+
         if self.raw_buffer["version"] == 1 and self.raw_buffer["job"]["project"] == "heeler-v2":
             pass
         else:
