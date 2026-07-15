@@ -119,6 +119,7 @@ class Validator:
             self.file_failure(file_name2)
             return
         
+        print(f"raw_buffer: {self.raw_buffer}")
         if self.raw_buffer["version"] == 1 and self.raw_buffer["job"]["project"] == "heeler-v2":
             pass
         else:
