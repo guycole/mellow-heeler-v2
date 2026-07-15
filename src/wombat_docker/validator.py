@@ -63,7 +63,7 @@ class Validator:
                     return False
 
                 load_log = {
-                    "crate_name": self.raw_buffer["crate"],
+                    "crate_name": self.raw_buffer["crateName"],
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
                     "file_name": test_file_name,                   
                     "geo_loc_id": geo_loc[0].id,
@@ -79,7 +79,7 @@ class Validator:
                 self.postgres.load_log_insert(load_log)
 
                 daily_score = {
-                    "crate_name": self.raw_buffer["crate"],
+                    "crate_name": self.raw_buffer["crateName"],
                     "file_quantity": 1,
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "obs_quantity": len(self.raw_buffer["observations"]),
@@ -87,6 +87,10 @@ class Validator:
                 }
 
                 self.postgres.daily_score_insert_or_update(daily_score)
+
+                if len(self.raw_buffer["observations"]) < 1:
+                    logger.info("skipping file with no observations")
+                    return False
 
                 return True
             else:

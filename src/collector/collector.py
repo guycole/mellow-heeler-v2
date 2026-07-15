@@ -99,7 +99,7 @@ class Collector:
                 "epochSeconds": epoch_seconds,
                 "iso8601": dt_object_utc.isoformat(),
             },
-            "crate": self.crate_name,
+            "crateName": self.crate_name,
             "fileName": f"{base_file_name}.json",
             "version": 1,
             "observations": observations,

@@ -55,12 +55,12 @@ class Koala:
         epochSeconds = self.raw_buffer.get("timeStamp", {}).get("epochSeconds", 0)
         
         result = {
-            "epochSeconds": epochSeconds,
+            "epochSeconds": self.raw_buffer.get("timeStamp", {}).get("epochSeconds", 0),
             "geoLoc": {
                 "site": self.raw_buffer.get("geoLoc", {}).get("siteName", "unknown")
             },
             "hostName": self.raw_buffer.get("equipment", {}).get("hostName", "unknown"),
-            "project": self.raw_buffer.get("project", "unknown"),
+            "project": self.raw_buffer.get("job", {}).get("project", "unknown"),
             "version": self.raw_buffer.get("version", 0),
             "wifi": self.raw_buffer.get("observations", []),
         }
@@ -68,7 +68,6 @@ class Koala:
         return result
 
     def execute(self) -> None:
-        logger.info("koala execute")
         logger.info(f"success dir:{self.success_dir}")
 
         os.chdir(self.success_dir)
@@ -87,6 +86,10 @@ class Koala:
         winner = None
         for key in sorted(candidates):
             winner = candidates[key]
+
+        if winner is None:
+            logger.warning("no valid candidates found")
+            return
 
         out_file_name = f"{self.koala_dir}/{winner['epochSeconds']}.{winner['hostName']}"
         self.file_writer(out_file_name, winner)
