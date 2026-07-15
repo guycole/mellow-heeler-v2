@@ -30,12 +30,11 @@ class BootBoy:
             sys.exit(1)
 
         # Compose new config dict for YAML output
-        receiver = config_data.get("receiver", {})
-        geo_loc = config_data.get("geoLoc", {})
         crate_name = config_data.get("crateName", "xxx")
+        geo_loc = config_data.get("geoLoc", {})
         host_name = config_data.get("hostName", target)
         host_type = config_data.get("type", "xxx")
-        mode = "iwlist"
+        receiver = config_data.get("receiver", {})
 
         yaml_config = {
             "crateName": crate_name,
@@ -45,7 +44,6 @@ class BootBoy:
             },
             "receiver": {
                 "antenna": receiver.get("antenna", "xxx"),
-                "mode": mode,
                 "receiverId": receiver.get("id", "xxx"),
                 "task": receiver.get("task", "xxx"),
                 "type": receiver.get("type", "xxx"),
@@ -53,15 +51,14 @@ class BootBoy:
             "freshDir": "/var/wombat/fresh/heeler",
             "geoLoc": geo_loc,
             "gpsEnable": False,
+            "scanFile": "/tmp/iwlist.scan",
         }
-
-        if mode == "iwlist":
-            yaml_config["scanFile"] = "/tmp/iwlist.scan"
 
         # Write to config.yaml in the current directory
         try:
             with open("config.yaml", "w") as f:
                 yaml.dump(yaml_config, f, default_flow_style=False)
+
             print("config.yaml generated successfully.")
         except Exception as e:
             print(f"Error writing config.yaml: {e}")

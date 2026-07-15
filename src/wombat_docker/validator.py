@@ -66,13 +66,14 @@ class Validator:
                     "crate_name": self.raw_buffer["crate"],
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
                     "file_name": test_file_name,                   
-                    "file_type": self.raw_buffer["project"],
                     "geo_loc_id": geo_loc[0].id,
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "load_time": datetime.datetime.now(),
+                    "mode": "mode",
                     "obs_quantity": len(self.raw_buffer["observations"]),
                     "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
                     "site_name": self.raw_buffer["geoLoc"]["siteName"],
+                    "task": "task",
                 }
 
                 self.postgres.load_log_insert(load_log)

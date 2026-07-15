@@ -2,13 +2,13 @@
 -- Title: geo_loc.psql
 -- Description: geographic location look up table
 -- altitude in meters
--- host_name
+-- course in degrees
 -- fix_time is GPS fix time, not apply to fixed sites
+-- host_name
 -- latitude plus north decimal degrees
 -- longitude plus west decimal degrees
 -- site_name is geographic name or start with "mobile"
 -- speed in km/h
--- track in degrees
 --
 create table heeler_geo_loc (
   id         bigserial    primary key,
