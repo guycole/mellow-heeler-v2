@@ -69,11 +69,11 @@ class Validator:
                     "geo_loc_id": geo_loc[0].id,
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "load_time": datetime.datetime.now(),
-                    "mode": "mode",
+                    "mode": self.raw_buffer["job"]["mode"],
                     "obs_quantity": len(self.raw_buffer["observations"]),
                     "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
                     "site_name": self.raw_buffer["geoLoc"]["siteName"],
-                    "task": "task",
+                    "task": self.raw_buffer["receiver"]["task"],
                 }
 
                 self.postgres.load_log_insert(load_log)
