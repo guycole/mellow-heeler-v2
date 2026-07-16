@@ -14,6 +14,7 @@ from parser import Parser
 import yaml
 from yaml.loader import SafeLoader
 
+
 class BootBoy:
 
     def configuration(self, target: str) -> dict[str, any]:
@@ -67,14 +68,17 @@ class BootBoy:
         return {
             "receiver_task": receiver.get("task", "xxx"),
         }
-   
+
     def crontab(self) -> None:
         import subprocess
+
         crontab_entry = "*/10 * * * * $HOME/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1"
 
         new_crontab = crontab_entry + "\n"
         try:
-            proc = subprocess.run(["crontab", "-u", "wombat", "-"], input=new_crontab, text=True)
+            proc = subprocess.run(
+                ["crontab", "-u", "wombat", "-"], input=new_crontab, text=True
+            )
             if proc.returncode == 0:
                 print("Crontab updated successfully for wombat.")
             else:
@@ -82,17 +86,17 @@ class BootBoy:
         except Exception as e:
             print(f"Error updating wombat's crontab: {e}")
 
-
     def execute(self, target: str) -> None:
         self.configuration(target)
         self.crontab()
 
+
 #
-# 
+#
 #
 if __name__ == "__main__":
     target = socket.gethostname()
-#    target = "pi3b"
+    #    target = "pi3b"
 
     bb = BootBoy()
     bb.execute(target)

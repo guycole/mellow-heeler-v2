@@ -49,6 +49,7 @@ RUN printf '%s\n' '#!/bin/sh' 'set -e' '/usr/local/bin/collect-wombat-ids.sh' 's
 ENV FAILURE_DIR=/mnt/wombat/failure/
 ENV FRESH_DIR=/mnt/wombat/fresh/heeler
 ENV SUCCESS_DIR=/mnt/wombat/heeler/success/
+ENV KOALA_DIR=/mnt/wombat/heeler/koala
 
 ENV DB_CONN=postgresql+psycopg2://heeler_client:batabat@172.17.0.1:5432/heeler
 

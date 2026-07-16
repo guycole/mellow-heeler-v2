@@ -40,6 +40,7 @@ class DailyScore(Base):
     def __repr__(self):
         return f"daily_score({self.score_date} {self.host_name})"
 
+
 class GeoLoc(Base):
     __tablename__ = "heeler_geo_loc"
 
@@ -52,7 +53,7 @@ class GeoLoc(Base):
     longitude = Column(Float)
     site_name = Column(String)
     speed = Column(Float)
-   
+
     def __init__(self, args: dict[str, any]):
         self.altitude = args["altitude"]
         self.course = args["course"]
@@ -65,6 +66,7 @@ class GeoLoc(Base):
 
     def __repr__(self):
         return f"geo_loc({self.site_name} {self.host_name})"
+
 
 class LoadLog(Base):
     """load_log table definition"""
@@ -98,7 +100,10 @@ class LoadLog(Base):
         self.task = args["task"]
 
     def __repr__(self):
-        return f"load_log({self.file_name} {self.obs_time} {self.task} {self.host_name})"
+        return (
+            f"load_log({self.file_name} {self.obs_time} {self.task} {self.host_name})"
+        )
+
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***

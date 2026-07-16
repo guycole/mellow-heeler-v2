@@ -25,6 +25,7 @@ from sql_table import (
     LoadLog,
 )
 
+
 class PostGres:
     db_engine = None
     Session = None
@@ -57,9 +58,11 @@ class PostGres:
             print(error)
 
         return candidate
-    
+
     def geo_loc_select_by_site(self, site_name: str) -> List[GeoLoc]:
-        statement = select(GeoLoc).filter_by(site_name=site_name).order_by(GeoLoc.fix_time)
+        statement = (
+            select(GeoLoc).filter_by(site_name=site_name).order_by(GeoLoc.fix_time)
+        )
 
         with self.Session() as session:
             return session.scalars(statement).all()

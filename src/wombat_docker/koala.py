@@ -12,16 +12,12 @@ import os
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("koala")
 
+
 class Koala:
 
-    def __init__(self):      
-        # path from inside docker container
-        self.koala_dir = "/mnt/wombat/heeler/koala"
-        self.success_dir = "/mnt/wombat/heeler/success/"
-
-        # path for local development
-        # self.koala_dir = "/var/wombat/heeler/koala"
-        # self.success_dir = "/var/wombat/heeler/success/"
+    def __init__(self):
+        self.koala_dir = os.environ.get("KOALA_DIR", "/var/wombat/heeler/koala")
+        self.success_dir = os.environ.get("SUCCESS_DIR", "/var/wombat/heeler/success")
 
         # UID/GID are provided by container entrypoint; default keeps local behavior.
         self.wombat_uid = int(os.getenv("WOMBAT_UID", "1000"))
@@ -36,7 +32,7 @@ class Koala:
             return False
 
         return True
-    
+
     def file_writer(self, file_name: str, content: dict) -> bool:
         try:
             with open(file_name, "w", encoding="utf-8") as out_file:
@@ -51,9 +47,7 @@ class Koala:
         if not self.file_reader(file_name):
             logger.warning(f"file read failed for {file_name}")
             return {}
-        
-        epochSeconds = self.raw_buffer.get("timeStamp", {}).get("epochSeconds", 0)
-        
+
         result = {
             "epochSeconds": self.raw_buffer.get("timeStamp", {}).get("epochSeconds", 0),
             "geoLoc": {
@@ -74,7 +68,7 @@ class Koala:
         targets = [ff for ff in os.listdir(".") if ff.endswith(".json")]
         logger.info(f"{len(targets)} files noted")
 
-        # only process the most recent 
+        # only process the most recent
         candidates = {}
         max_list_size = 5
         for target in targets:
@@ -91,14 +85,17 @@ class Koala:
             logger.warning("no valid candidates found")
             return
 
-        out_file_name = f"{self.koala_dir}/{winner['epochSeconds']}.{winner['hostName']}"
+        out_file_name = (
+            f"{self.koala_dir}/{winner['epochSeconds']}.{winner['hostName']}"
+        )
         self.file_writer(out_file_name, winner)
         os.chown(out_file_name, self.wombat_uid, self.wombat_gid)
+
 
 if __name__ == "__main__":
     koala = Koala()
     koala.execute()
-    
+
 # ;;; Local Variables: ***
 # ;;; mode:python ***
 # ;;; End: ***

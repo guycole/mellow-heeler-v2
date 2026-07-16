@@ -22,14 +22,15 @@ from yaml.loader import SafeLoader
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("heeler")
 
+
 class Collector:
     def __init__(self, args: dict[str, any]):
         self.crate_name = args["crateName"]
         self.fresh_dir = configuration["freshDir"]
         self.gps_enable = configuration["gpsEnable"]
 
-        self.host_name = configuration['equipment']["hostName"]
-        self.host_type = configuration['equipment']["hostType"]
+        self.host_name = configuration["equipment"]["hostName"]
+        self.host_type = configuration["equipment"]["hostType"]
 
         self.altitude = configuration["geoLoc"]["altitude"]
         self.latitude = configuration["geoLoc"]["latitude"]
@@ -75,10 +76,9 @@ class Collector:
             epoch_seconds, tz=zoneinfo.ZoneInfo("UTC")
         )
 
-
         results = {
             "equipment": {
-                "antenna": self.antenna,  
+                "antenna": self.antenna,
                 "receiverId": self.receiver_id,
                 "receiverType": self.receiver_type,
                 "hostName": self.host_name,
@@ -106,6 +106,7 @@ class Collector:
         }
 
         self.json_file_writer(outfile_json, results)
+
 
 #
 # argv[1] = configuration filename

@@ -1,6 +1,6 @@
 #
 # Title: parser.py
-# Description: 
+# Description:
 # Development Environment: Ubuntu 22.04.5 LTS/python 3.10.12
 # Author: G.S. Cole (guycole at gmail dot com)
 #
@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 from typing import Any
+
 
 class Parser:
 
@@ -175,7 +176,9 @@ class Parser:
                 if match:
                     ciphers = [c.strip() for c in match.group(1).split() if c.strip()]
                     rsn["pairwise_ciphers"].extend(ciphers)
-                    rsn["pairwise_ciphers"] = list(dict.fromkeys(rsn["pairwise_ciphers"]))
+                    rsn["pairwise_ciphers"] = list(
+                        dict.fromkeys(rsn["pairwise_ciphers"])
+                    )
                     continue
 
                 match = re.search(r"Authentication Suites.*:\s*(.+)$", line)
@@ -196,7 +199,9 @@ class Parser:
                 if match:
                     ciphers = [c.strip() for c in match.group(1).split() if c.strip()]
                     wpa["pairwise_ciphers"].extend(ciphers)
-                    wpa["pairwise_ciphers"] = list(dict.fromkeys(wpa["pairwise_ciphers"]))
+                    wpa["pairwise_ciphers"] = list(
+                        dict.fromkeys(wpa["pairwise_ciphers"])
+                    )
                     continue
 
                 match = re.search(r"Authentication Suites.*:\s*(.+)$", line)
@@ -228,8 +233,9 @@ class Parser:
         if len(raw_buffer) < 3:
             print("execute: empty file")
             return []
-        
+
         return self.parser(raw_buffer)
+
 
 #
 # argv[1] = configuration filename
