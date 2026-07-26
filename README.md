@@ -77,6 +77,8 @@ If both the "json" and "raw" files are present on the Wombat gateway, the json f
 
 wombat_docker also updates postgres tables to keep simple statistics on collection.
 
+[heeler-validate.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-validate.sh) is invoked from the wombat crontab and is the correct way to run the validator — it wraps the `docker run` invocation below.
+
 Build and run from the `src/` directory:
 ```sh
 # build
