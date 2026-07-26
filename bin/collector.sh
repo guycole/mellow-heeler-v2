@@ -5,14 +5,12 @@
 # Development Environment: Ubuntu 22.04.05 LTS
 # Author: Guy Cole (guycole at gmail dot com)
 #
-# */10 * * * * /home/wombat/Documents/github/mellow-heeler-v2/bin/collector.sh > /dev/null 2>&1
-#
 PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #
 hostname=$(hostname)
 logger -p local3.info "collector heeler $hostname"
 #
-WORK_DIR="/home/wombat/github/mellow-heeler-v2/src/collector"
+WORK_DIR="$HOME/github/mellow-heeler-v2/src/collector"
 #
 echo "start collector"
 sleep 13
