@@ -9,6 +9,8 @@ import datetime
 import json
 import os
 
+from helper.json_helper import JsonHelper, schema
+
 from helper.postgres import PostGres
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -26,27 +28,19 @@ class Loader:
         self.failure = 0
         self.success = 0
 
+        self.jh = JsonHelper()
+
     def file_failure(self, file_name: str):
-        # logger.info(f"file failure:{file_name}")
+        #        logger.info(f"file failure:{file_name}")
 
         self.failure += 1
         os.rename(file_name, self.failure_dir + "/" + file_name)
 
     def file_success(self, file_name: str):
-        # logger.info(f"file success:{file_name}")
+        #        logger.info(f"file success:{file_name}")
 
         self.success += 1
         os.remove(file_name)
-
-    def file_reader(self, file_name: str) -> bool:
-        try:
-            with open(file_name, "r", encoding="utf-8") as in_file:
-                self.raw_buffer = json.load(in_file)
-        except Exception as error:
-            logger.error(f"file read failed for {file_name}: {error}")
-            return False
-
-        return True
 
     def load_log(self, file_name: str) -> bool:
         try:
@@ -56,12 +50,11 @@ class Loader:
                 return False
             else:
                 geo_loc = self.postgres.geo_loc_select_by_site(
-                    self.raw_buffer["geoLoc"]["siteName"]
+                    self.jh.raw_json["geoLoc"]["siteName"]
                 )
                 if len(geo_loc) == 0:
-                    print(
-                        "must insert geo_loc for site:",
-                        self.raw_buffer["geoLoc"]["siteName"],
+                    logger.error(
+                        f"must insert geo_loc for site: {self.jh.raw_json['geoLoc']['siteName']}"
                     )
                     return False
 
@@ -69,28 +62,28 @@ class Loader:
                 geo_loc_id = geo_loc[0].id
 
                 candidate = {
-                    "crate_name": self.raw_buffer["crateName"],
-                    "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
+                    "crate_name": self.jh.raw_json["crateName"],
+                    "epoch_seconds": self.jh.raw_json["timeStamp"]["epochSeconds"],
                     "file_name": file_name,
                     "geo_loc_id": geo_loc_id,
-                    "host_name": self.raw_buffer["equipment"]["hostName"],
+                    "host_name": self.jh.raw_json["equipment"]["hostName"],
                     "load_time": datetime.datetime.now(),
-                    "mode": self.raw_buffer["job"]["mode"],
-                    "obs_quantity": len(self.raw_buffer["observations"]),
-                    "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
-                    "site_name": self.raw_buffer["geoLoc"]["siteName"],
-                    "task": self.raw_buffer["job"]["task"],
+                    "mode": self.jh.raw_json["job"]["mode"],
+                    "obs_quantity": len(self.jh.raw_json["observations"]),
+                    "obs_time": self.jh.raw_json["timeStamp"]["iso8601"],
+                    "site_name": self.jh.raw_json["geoLoc"]["siteName"],
+                    "task": self.jh.raw_json["job"]["task"],
                 }
 
                 self.load_log_id = self.postgres.load_log_insert(candidate).id
 
                 daily_score = {
-                    "crate_name": self.raw_buffer["crateName"],
+                    "crate_name": self.jh.raw_json["crateName"],
                     "file_quantity": 1,
-                    "host_name": self.raw_buffer["equipment"]["hostName"],
-                    "obs_quantity": len(self.raw_buffer["observations"]),
+                    "host_name": self.jh.raw_json["equipment"]["hostName"],
+                    "obs_quantity": len(self.jh.raw_json["observations"]),
                     "score_date": datetime.date.fromisoformat(
-                        self.raw_buffer["timeStamp"]["iso8601"][:10]
+                        self.jh.raw_json["timeStamp"]["iso8601"][:10]
                     ),
                 }
 
@@ -104,14 +97,14 @@ class Loader:
 
     def load_obs(self) -> None:
         try:
-            observations = self.raw_buffer["observations"]
+            observations = self.jh.raw_json["observations"]
             for obs in observations:
                 wap_id = self.postgres.wap_select(self.make_wap_from_obs(obs, 1))[0].id
 
                 candidate = {
                     "bssid": obs["bssid"],
                     "load_log_id": self.load_log_id,
-                    "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
+                    "obs_time": self.jh.raw_json["timeStamp"]["iso8601"],
                     "signal_dbm": obs["signal_dbm"],
                     "wap_id": wap_id,
                 }
@@ -125,10 +118,10 @@ class Loader:
         return {
             "bssid": bssid.strip(),
             "capability": obs["capabilities"].strip(),
-            "cipher": (obs.get("cipher_type") or "stubx").strip(),
+            "cipher": (obs.get("cipher_type") or "xstubx").strip(),
             "frequency_mhz": obs["frequency_mhz"],
             "key": f"{bssid}_{version}",
-            "ssid": (obs.get("ssid") or "stubx").strip(),
+            "ssid": (obs.get("ssid") or "xstubx").strip(),
             "version": version,
         }
 
@@ -144,7 +137,7 @@ class Loader:
         # consolidate WAPs from observations, versioning by bssid when attributes differ
         candidates = {}
 
-        for observation in self.raw_buffer["observations"]:
+        for observation in self.jh.raw_json["observations"]:
             bssid = observation["bssid"].lower()
 
             # gather all existing entries for this bssid
@@ -167,7 +160,7 @@ class Loader:
                     logger.info(f"new wap version {next_version} for bssid {bssid}")
 
         logger.info(
-            f"load_wap: {len(candidates)} unique WAPs from {len(self.raw_buffer['observations'])} observations"
+            f"load_wap: {len(candidates)} unique WAPs from {len(self.jh.raw_json['observations'])} observations"
         )
 
         for candidate in candidates.values():
@@ -196,28 +189,27 @@ class Loader:
             self.file_failure(file_name)
             return
 
-        if not self.file_reader(file_name):
-            logger.warning(f"file read failed for {file_name}")
+        if self.jh.json_file_reader(file_name, True):
+            pass
+        else:
+            logger.warning(f"json file read/verify failure for {file_name}")
             self.file_failure(file_name)
             return
 
-        if self.raw_buffer["fileName"] != file_name:
-            logger.warning(f"mismatched file name: {self.raw_buffer['fileName']} vs {file_name}")
+        if self.jh.raw_json["fileName"] != file_name:
+            logger.warning(
+                f"mismatched file name: {self.jh.raw_json['fileName']} vs {file_name}"
+            )
             self.file_failure(file_name)
             return
 
-        try:
-            if (
-                self.raw_buffer["version"] == 1
-                and self.raw_buffer["job"]["project"] == "heeler-v2"
-            ):
-                pass
-            else:
-                logger.warning(f"invalid version or project for {file_name}")
-                self.file_failure(file_name)
-                return
-        except Exception as error:
-            logger.error(f"project/version failure for {file_name}: {error}")
+        if (
+            self.jh.raw_json["version"] == 1
+            and self.jh.raw_json["job"]["project"] == "heeler-v2"
+        ):
+            pass
+        else:
+            logger.warning(f"invalid version or project for {file_name}")
             self.file_failure(file_name)
             return
 
@@ -229,8 +221,7 @@ class Loader:
             self.file_failure(file_name)
 
     def execute(self) -> None:
-        logger.info("loader")
-        logger.info(f"fresh dir:{self.fresh_dir}")
+        logger.info(f"loader fresh dir:{self.fresh_dir}")
 
         os.chdir(self.fresh_dir)
         targets = sorted(os.listdir("."))
@@ -240,6 +231,7 @@ class Loader:
             self.file_processor(target)
 
         logger.info(f"validator success:{self.success} failure:{self.failure}")
+
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***

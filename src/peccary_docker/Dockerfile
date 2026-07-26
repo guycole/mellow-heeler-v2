@@ -37,10 +37,8 @@ COPY peccary_docker/requirements.txt ./
 RUN $VIRTUAL_ENV/bin/pip install --no-cache-dir -r requirements.txt
 
 COPY helper/ ./helper/
-COPY peccary_docker/file_helper.py ./
 COPY peccary_docker/heeler_app.py ./
 COPY peccary_docker/loader.py ./
-COPY peccary_docker/scorer.py ./
 
 RUN printf '%s\n' '#!/bin/sh' 'set -e' '/usr/local/bin/collect-wombat-ids.sh' 'set -a' '[ -f /app/wombat_env.env ] && . /app/wombat_env.env' 'set +a' 'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
 	&& chmod +x /usr/local/bin/docker-entrypoint.sh
