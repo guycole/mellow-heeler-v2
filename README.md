@@ -17,7 +17,7 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
 
 4. Sharing latest observation with [Mellow Koala](https://github.com/guycole/mellow-koala).
 
-5. Batching observation files into compressed tar files and uploading to AWS S3
+5. Batching observation files into compressed tar files and uploading to AWS S3 (for archive and sharing with [Mellow Peccary](https://github.com/guycole/mellow-peccary)).
 
 ## Mellow Peccary services
 1. Long term storage and analysis of Heeler observations
@@ -73,17 +73,40 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
 ## Wombat validation cycle
 Validation is performed on the wombat gateway by [wombat_docker](https://github.com/guycole/mellow-heeler-v2/tree/main/src/wombat_docker).  
 
-If both the "json" and "raw" files are present on the Wombat gateway, the json file is tested for readability and json schema correctness.  Failed files are moved to the "failure" directory and a successful files go to "heeler/succcess" for additional processing.  
+If both the "json" and "raw" files are present on the Wombat gateway, the json file is tested for readability and json schema correctness.  Failed files are moved to the "failure" directory and successful files go to "heeler/success" for additional processing.  
 
 wombat_docker also updates postgres tables to keep simple statistics on collection.
+
+Build and run from the `src/` directory:
+```sh
+# build
+docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) \
+  -f wombat_docker/Dockerfile -t wombat:latest .
+
+# run validator
+docker run -e stuntbox=validator -v /var/wombat:/mnt/wombat --name wombat wombat:latest
+
+# run koala
+docker run -e stuntbox=koala --name wombat wombat:latest
+```
 
 ### Mellow Koala cycle
 [Mellow Koala](https://github.com/guycole/mellow-koala) is only concerned about the most recent load cycle.  Every validation pass should find the most recent observation to write to "heeler/koala" and then invoke [heeler-koala-import.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-koala-import.sh) to consume the latest observation.
 
 ## Wombat archival cycle
-[heeler-archive.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-archive.sh) collects the files from "heeler/success" and saves a tar file with both the json and raw files into the "heeler/archive" directory, then saves a tar file with only the json files into the "heeler/export" directory.  Export files are written to S3 and then deleted, while archive files remain indefinately.  
+[heeler-archive.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-archive.sh) collects the files from "heeler/success" and saves a tar file with both the json and raw files into the "heeler/archive" directory, then saves a tar file with only the json files into the "heeler/export" directory.  Export files are written to S3 and then deleted, while archive files remain indefinitely.  
 
 ## Peccary import cycle
 Peccary loading is performed by [peccary_docker](https://github.com/guycole/mellow-heeler-v2/tree/main/src/peccary_docker).  All of the collected observation is stored in postgres for future analysis.
 
 Peccary imports heeler tar files from AWS S3 to load.
+
+Build and run from the `src/` directory:
+```sh
+# build
+docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) \
+  -f peccary_docker/Dockerfile -t peccary:latest .
+
+# run
+docker run -v /var/peccary:/mnt/peccary --name peccary peccary:latest
+```
