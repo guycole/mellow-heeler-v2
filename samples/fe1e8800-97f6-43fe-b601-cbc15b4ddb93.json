@@ -1,0 +1,117 @@
+{
+    "equipment": {
+        "antenna": "whip",
+        "receiverId": 2,
+        "receiverType": "ac-1300",
+        "hostName": "pi3b",
+        "hostType": "rpi3"
+    },
+    "geoLoc": {
+        "altitude": 0,
+        "latitude": 38.108,
+        "longitude": -122.268,
+        "siteName": "vallejo01"
+    },
+    "job": {
+        "mode": "iwlist",
+        "project": "heeler-v2",
+        "task": "heeler-v2-iwlist"
+    },
+    "timeStamp": {
+        "epochSeconds": 1784402415,
+        "iso8601": "2026-07-18T19:20:15+00:00"
+    },
+    "crateName": "wombat04",
+    "fileName": "fe1e8800-97f6-43fe-b601-cbc15b4ddb93.json",
+    "version": 1,
+    "observations": [
+        {
+            "bssid": "94:18:65:F3:3A:76",
+            "frequency_mhz": 2447,
+            "signal_dbm": -57,
+            "ssid": "braingang2",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "0E:96:E6:41:23:63",
+            "frequency_mhz": 2447,
+            "signal_dbm": -60,
+            "ssid": "DIRECT-63-HP M102 LaserJet",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "E2:BB:9E:D0:B0:30",
+            "frequency_mhz": 2447,
+            "signal_dbm": -73,
+            "ssid": "DIRECT-9ED03030",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "6C:CD:D6:2A:62:06",
+            "frequency_mhz": 2447,
+            "signal_dbm": -65,
+            "ssid": "braingang2_2GEXT",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "94:18:65:F3:3A:76",
+            "frequency_mhz": 2447,
+            "signal_dbm": -33,
+            "ssid": "braingang2",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "E2:BB:9E:D0:B0:30",
+            "frequency_mhz": 2447,
+            "signal_dbm": -59,
+            "ssid": "DIRECT-9ED03030",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "94:18:65:F3:3A:75",
+            "frequency_mhz": 5220,
+            "signal_dbm": -46,
+            "ssid": "braingang5",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "6C:CD:D6:2A:62:06",
+            "frequency_mhz": 2447,
+            "signal_dbm": -46,
+            "ssid": "braingang2_2GEXT",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "6C:CD:D6:2A:62:05",
+            "frequency_mhz": 5765,
+            "signal_dbm": -52,
+            "ssid": "braingang2_5GEXT",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "0E:96:E6:41:23:63",
+            "frequency_mhz": 2447,
+            "signal_dbm": -54,
+            "ssid": "DIRECT-63-HP M102 LaserJet",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        },
+        {
+            "bssid": "C2:D2:F3:DF:AA:06",
+            "frequency_mhz": 2447,
+            "signal_dbm": -41,
+            "ssid": "",
+            "capabilities": "wpa2-psk",
+            "cipher_type": "CCMP"
+        }
+    ]
+}

@@ -30,6 +30,7 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
 3. The two output files are placed in the "fresh" directory where rsync(1) will move from collector to gateway.  "Fresh" file directory is defined within config.yaml
 
 ## Sample JSON output
+[complete sample](https://github.com/guycole/mellow-heeler-v2/blob/readme_update/samples/fe1e8800-97f6-43fe-b601-cbc15b4ddb93.json)
 ```
 {
     "equipment": {
@@ -96,7 +97,7 @@ docker run -e stuntbox=koala --name wombat wombat:latest
 [Mellow Koala](https://github.com/guycole/mellow-koala) is only concerned about the most recent load cycle.  Every validation pass should find the most recent observation to write to "heeler/koala" and then invoke [heeler-koala-import.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-koala-import.sh) to consume the latest observation.
 
 ## Wombat archival cycle
-[heeler-archive.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-archive.sh) collects the files from "heeler/success" and saves a tar file with both the json and raw files into the "heeler/archive" directory, then saves a tar file with only the json files into the "heeler/export" directory.  Export files are written to S3 and then deleted, while archive files remain indefinitely.  
+[heeler-archive.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-archive.sh) collects the files from "heeler/success" and saves a tar file with both the json and raw files into the "heeler/archive" directory, then saves a tar file with only the json files into the "heeler/export" directory.  Export files are written to S3 and then deleted, while archive files remain on the gateway indefinitely.  
 
 ## Peccary import cycle
 Peccary loading is performed by [peccary_docker](https://github.com/guycole/mellow-heeler-v2/tree/main/src/peccary_docker).  All of the collected observation is stored in postgres for future analysis.
