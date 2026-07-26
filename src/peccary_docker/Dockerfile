@@ -1,8 +1,7 @@
 #
-# docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) -t heeler:latest .
-# docker run -v /var/wombat:/mnt/wombat --name heeler heeler:latest
-# docker run -e stuntbox=validator -v /var/wombat:/mnt/wombat --name heeler heeler:latest
-# docker run -e stuntbox=koala --name heeler heeler:latest
+# Build from the src/ directory (one level above this file):
+# docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) -f peccary_docker/Dockerfile -t heeler:latest .
+# docker run -v /var/peccary:/mnt/peccary --name peccary peccary:latest
 #
 FROM python:3.11-slim
 
@@ -34,19 +33,23 @@ ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Copy requirements and install them inside the venv
-COPY requirements.txt ./
+COPY peccary_docker/requirements.txt ./
 RUN $VIRTUAL_ENV/bin/pip install --no-cache-dir -r requirements.txt
 
-COPY koala.py ./
-COPY heeler_app.py ./
-COPY postgres.py ./
-COPY scorer.py ./
-COPY sql_table.py ./
-COPY validator.py ./
+COPY helper/ ./helper/
+COPY peccary_docker/heeler_app.py ./
+COPY peccary_docker/loader.py ./
 
 RUN printf '%s\n' '#!/bin/sh' 'set -e' '/usr/local/bin/collect-wombat-ids.sh' 'set -a' '[ -f /app/wombat_env.env ] && . /app/wombat_env.env' 'set +a' 'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
 	&& chmod +x /usr/local/bin/docker-entrypoint.sh
 
-RUN mkdir -p /mnt/wombat
+ENV FAILURE_DIR=/mnt/peccary/heeler/failure
+ENV FRESH_DIR=/mnt/peccary/heeler/heeler-v2
+
+# On Linux (production): override with -e DB_CONN=...@172.17.0.1:5432/heeler
+# On macOS (Docker Desktop): host.docker.internal resolves to the host machine
+ENV DB_CONN=postgresql+psycopg2://heeler_client:batabat@host.docker.internal:5432/heeler
+
+RUN mkdir -p /mnt/peccary
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["python", "heeler_app.py"]

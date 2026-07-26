@@ -7,7 +7,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column
-from sqlalchemy import BigInteger, Boolean, Date, DateTime, Float, Integer, String
+from sqlalchemy import BigInteger, Boolean, Date, DateTime, Float, Integer, SmallInteger, String
 
 from sqlalchemy.orm import registry
 from sqlalchemy.orm import DeclarativeBase
@@ -15,15 +15,13 @@ from sqlalchemy.ext.declarative import declared_attr
 
 mapper_registry = registry()
 
-
 class Base(DeclarativeBase):
     pass
-
 
 class DailyScore(Base):
     __tablename__ = "heeler_daily_score"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     crate_name = Column(String)
     file_quantity = Column(Integer)
     host_name = Column(String)
@@ -40,11 +38,10 @@ class DailyScore(Base):
     def __repr__(self):
         return f"daily_score({self.score_date} {self.host_name})"
 
-
 class GeoLoc(Base):
     __tablename__ = "heeler_geo_loc"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     altitude = Column(Float)
     course = Column(Float)
     fix_time = Column(DateTime)
@@ -53,7 +50,7 @@ class GeoLoc(Base):
     longitude = Column(Float)
     site_name = Column(String)
     speed = Column(Float)
-
+   
     def __init__(self, args: dict[str, any]):
         self.altitude = args["altitude"]
         self.course = args["course"]
@@ -67,13 +64,10 @@ class GeoLoc(Base):
     def __repr__(self):
         return f"geo_loc({self.site_name} {self.host_name})"
 
-
 class LoadLog(Base):
-    """load_log table definition"""
-
     __tablename__ = "heeler_load_log"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     crate_name = Column(String)
     epoch_seconds = Column(BigInteger)
     file_name = Column(String)
@@ -81,7 +75,7 @@ class LoadLog(Base):
     host_name = Column(String)
     load_time = Column(DateTime)
     mode = Column(String)
-    obs_quantity = Column(Integer)
+    obs_quantity = Column(SmallInteger)
     obs_time = Column(DateTime)
     site_name = Column(String)
     task = Column(String)
@@ -100,10 +94,53 @@ class LoadLog(Base):
         self.task = args["task"]
 
     def __repr__(self):
-        return (
-            f"load_log({self.file_name} {self.obs_time} {self.task} {self.host_name})"
-        )
+        return f"load_log({self.file_name} {self.obs_time} {self.task} {self.host_name})"
 
+class Observation(Base):
+    """observation table definition"""
+
+    __tablename__ = "heeler_observation"
+
+    id = Column(BigInteger, primary_key=True)
+    bssid = Column(String)
+    load_log_id = Column(BigInteger)
+    obs_time = Column(DateTime)
+    signal_dbm = Column(SmallInteger)
+    wap_id = Column(BigInteger)
+
+    def __init__(self, args: dict[str, any]):
+        self.bssid = args["bssid"]
+        self.load_log_id = args["load_log_id"]
+        self.obs_time = args["obs_time"]
+        self.signal_dbm = args["signal_dbm"]
+        self.wap_id = args["wap_id"]
+
+    def __repr__(self):
+        return f"observation({self.wap_id} {self.load_log_id} {self.bssid})"
+
+class Wap(Base):
+    """wap table definition"""
+
+    __tablename__ = "heeler_wap"
+
+    id = Column(BigInteger, primary_key=True)
+    bssid = Column(String)
+    capability = Column(String)
+    cipher = Column(String)
+    frequency_mhz = Column(SmallInteger)
+    ssid = Column(String)
+    version = Column(Integer)
+
+    def __init__(self, args: dict[str, any]):
+        self.bssid = args["bssid"]
+        self.capability = args["capability"]
+        self.cipher = args["cipher"]
+        self.frequency_mhz = args["frequency_mhz"]
+        self.ssid = args["ssid"]
+        self.version = args["version"]
+
+    def __repr__(self):
+        return f"wap({self.bssid} {self.version} {self.ssid})"
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***

@@ -6,13 +6,15 @@
 #
 import logging
 import os
+import sys
+
+from helper.postgres import PostGres
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from koala import Koala
 from validator import Validator
-from postgres import PostGres
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("heeler")
