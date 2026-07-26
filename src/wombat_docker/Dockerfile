@@ -52,6 +52,7 @@ ENV FRESH_DIR=/mnt/wombat/fresh/heeler
 ENV KOALA_DIR=/mnt/wombat/heeler/koala
 ENV SUCCESS_DIR=/mnt/wombat/heeler/success
 
+# wombat gateway
 ENV DB_CONN=postgresql+psycopg2://heeler_client:batabat@172.17.0.1:5432/heeler
 
 RUN mkdir -p /mnt/wombat

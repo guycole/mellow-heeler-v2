@@ -189,9 +189,7 @@ class Loader:
             self.file_failure(file_name)
             return
 
-        if self.jh.json_file_reader(file_name, True):
-            pass
-        else:
+        if not self.jh.json_file_reader(file_name, True):
             logger.warning(f"json file read/verify failure for {file_name}")
             self.file_failure(file_name)
             return

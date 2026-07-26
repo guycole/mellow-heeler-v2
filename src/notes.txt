@@ -1,1 +1,0 @@
-/app is already on sys.path, so from helper.postgres import PostGres resolves naturally. If you ever need to run locally, PYTHONPATH=src python src/peccary_docker/heeler_app.py will work.
