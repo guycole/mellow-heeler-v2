@@ -19,7 +19,7 @@ from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import desc
 
-from sql_table import (
+from .sql_table import (
     DailyScore,
     GeoLoc,
     LoadLog,

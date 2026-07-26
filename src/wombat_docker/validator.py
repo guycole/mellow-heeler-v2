@@ -9,7 +9,7 @@ import datetime
 import json
 import os
 
-from postgres import PostGres
+from helper.postgres import PostGres
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("validator")
@@ -127,6 +127,12 @@ class Validator:
         test_file_name = file_name1 if file_name1.endswith(".json") else file_name2
         if not self.file_reader(test_file_name):
             logger.warning(f"file read failed for {test_file_name}")
+            self.file_failure(file_name1)
+            self.file_failure(file_name2)
+            return
+
+        if self.raw_buffer["fileName"] != test_file_name:
+            logger.warning(f"mismatched file name: {self.raw_buffer['fileName']} vs {test_file_name}")
             self.file_failure(file_name1)
             self.file_failure(file_name2)
             return

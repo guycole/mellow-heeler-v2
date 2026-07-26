@@ -12,7 +12,7 @@ logger -p local3.info "heeler loader $hostname"
 #
 echo "start loader"
 #
-#docker rm heeler;docker run -v /var/peccary/heeler:/mnt/peccary/heeler --name heeler heeler:latest
+docker rm heeler;docker run -v /var/peccary/heeler:/mnt/peccary/heeler --name heeler heeler:latest
 #
 echo "end loader"
 #

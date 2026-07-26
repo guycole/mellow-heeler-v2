@@ -9,8 +9,9 @@ import datetime
 import json
 import os
 
-from postgres import PostGres
-from sql_table import LoadLog
+from helper.postgres import PostGres
+from helper.sql_table import LoadLog
+
 
 class Scorer:
 

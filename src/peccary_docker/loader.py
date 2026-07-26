@@ -9,10 +9,11 @@ import datetime
 import json
 import os
 
-from postgres import PostGres
+from helper.postgres import PostGres
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("loader")
+
 
 class Loader:
 
@@ -26,18 +27,16 @@ class Loader:
         self.success = 0
 
     def file_failure(self, file_name: str):
-        #logger.info(f"file failure:{file_name}")
+        # logger.info(f"file failure:{file_name}")
 
         self.failure += 1
         os.rename(file_name, self.failure_dir + "/" + file_name)
 
-    def file_success(self, file_name1: str, file_name2: str):
-        #logger.info(f"file success:{file_name1}, {file_name2}")
+    def file_success(self, file_name: str):
+        # logger.info(f"file success:{file_name}")
 
         self.success += 1
-        # must delete file
-#        os.rename(file_name1, self.success_dir + "/" + file_name1)
-#        os.rename(file_name2, self.success_dir + "/" + file_name2)
+        os.remove(file_name)
 
     def file_reader(self, file_name: str) -> bool:
         try:
@@ -56,36 +55,43 @@ class Loader:
                 logger.info(f"skippping already processed:{file_name}")
                 return False
             else:
-                geo_loc = self.postgres.geo_loc_select_by_site(self.raw_buffer["geoLoc"]["siteName"])
+                geo_loc = self.postgres.geo_loc_select_by_site(
+                    self.raw_buffer["geoLoc"]["siteName"]
+                )
                 if len(geo_loc) == 0:
-                    print("must insert geo_loc for site:", self.raw_buffer["geoLoc"]["siteName"])
+                    print(
+                        "must insert geo_loc for site:",
+                        self.raw_buffer["geoLoc"]["siteName"],
+                    )
                     return False
-                
+
                 # todo handle mobile or missing geoloc
                 geo_loc_id = geo_loc[0].id
 
                 candidate = {
-                    "crate_name": self.raw_buffer["crate"],
+                    "crate_name": self.raw_buffer["crateName"],
                     "epoch_seconds": self.raw_buffer["timeStamp"]["epochSeconds"],
                     "file_name": file_name,
-                    "file_time": self.raw_buffer["timeStamp"]["iso8601"],
-                    "file_type": self.raw_buffer["project"],
                     "geo_loc_id": geo_loc_id,
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "load_time": datetime.datetime.now(),
+                    "mode": self.raw_buffer["job"]["mode"],
                     "obs_quantity": len(self.raw_buffer["observations"]),
                     "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
                     "site_name": self.raw_buffer["geoLoc"]["siteName"],
+                    "task": self.raw_buffer["job"]["task"],
                 }
 
                 self.load_log_id = self.postgres.load_log_insert(candidate).id
 
                 daily_score = {
-                    "crate_name": self.raw_buffer["crate"],
+                    "crate_name": self.raw_buffer["crateName"],
                     "file_quantity": 1,
                     "host_name": self.raw_buffer["equipment"]["hostName"],
                     "obs_quantity": len(self.raw_buffer["observations"]),
-                    "score_date": datetime.date.fromisoformat(self.raw_buffer["timeStamp"]["iso8601"][:10]),
+                    "score_date": datetime.date.fromisoformat(
+                        self.raw_buffer["timeStamp"]["iso8601"][:10]
+                    ),
                 }
 
                 self.postgres.daily_score_insert_or_update(daily_score)
@@ -93,7 +99,7 @@ class Loader:
                 return True
         except Exception as error:
             logger.error(f"postgres insert failed for {file_name}: {error}")
-        
+
         return False
 
     def load_obs(self) -> None:
@@ -107,7 +113,7 @@ class Loader:
                     "load_log_id": self.load_log_id,
                     "obs_time": self.raw_buffer["timeStamp"]["iso8601"],
                     "signal_dbm": obs["signal_dbm"],
-                    "wap_id": wap_id
+                    "wap_id": wap_id,
                 }
 
                 self.postgres.observation_insert(candidate)
@@ -123,12 +129,17 @@ class Loader:
             "frequency_mhz": obs["frequency_mhz"],
             "key": f"{bssid}_{version}",
             "ssid": (obs.get("ssid") or "stubx").strip(),
-            "version": version
+            "version": version,
         }
-        
+
     def match_wap(self, wap1: dict[str, any], wap2: dict[str, any]) -> bool:
-        return wap1["frequency_mhz"] == wap2["frequency_mhz"] and wap1["ssid"] == wap2["ssid"] and wap1["capability"] == wap2["capability"] and wap1["cipher"] == wap2["cipher"]
-    
+        return (
+            wap1["frequency_mhz"] == wap2["frequency_mhz"]
+            and wap1["ssid"] == wap2["ssid"]
+            and wap1["capability"] == wap2["capability"]
+            and wap1["cipher"] == wap2["cipher"]
+        )
+
     def load_wap(self) -> None:
         # consolidate WAPs from observations, versioning by bssid when attributes differ
         candidates = {}
@@ -155,7 +166,9 @@ class Loader:
                     candidates[temp["key"]] = temp
                     logger.info(f"new wap version {next_version} for bssid {bssid}")
 
-        logger.info(f"load_wap: {len(candidates)} unique WAPs from {len(self.raw_buffer['observations'])} observations")
+        logger.info(
+            f"load_wap: {len(candidates)} unique WAPs from {len(self.raw_buffer['observations'])} observations"
+        )
 
         for candidate in candidates.values():
             try:
@@ -165,7 +178,9 @@ class Loader:
                     db_versions = self.postgres.wap_select_by_bssid(candidate["bssid"])
                     if db_versions:
                         candidate["version"] = max(w.version for w in db_versions) + 1
-                        candidate["key"] = f"{candidate['bssid']}_{candidate['version']}"
+                        candidate["key"] = (
+                            f"{candidate['bssid']}_{candidate['version']}"
+                        )
                     self.postgres.wap_insert(candidate)
             except Exception as error:
                 logger.error(f"failed to load wap: {error}")
@@ -186,16 +201,30 @@ class Loader:
             self.file_failure(file_name)
             return
 
-        if self.raw_buffer["version"] == 1 and self.raw_buffer["project"] == "heeler-v2":
-            pass
-        else:
-            logger.warning(f"invalid version or project for {file_name}")
+        if self.raw_buffer["fileName"] != file_name:
+            logger.warning(f"mismatched file name: {self.raw_buffer['fileName']} vs {file_name}")
             self.file_failure(file_name)
             return
-        
+
+        try:
+            if (
+                self.raw_buffer["version"] == 1
+                and self.raw_buffer["job"]["project"] == "heeler-v2"
+            ):
+                pass
+            else:
+                logger.warning(f"invalid version or project for {file_name}")
+                self.file_failure(file_name)
+                return
+        except Exception as error:
+            logger.error(f"project/version failure for {file_name}: {error}")
+            self.file_failure(file_name)
+            return
+
         if self.load_log(file_name):
             self.load_wap()
             self.load_obs()
+            self.file_success(file_name)
         else:
             self.file_failure(file_name)
 
