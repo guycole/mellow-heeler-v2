@@ -1,21 +1,33 @@
 # mellow-heeler-v2
-[Wireless Access Point](https://en.wikipedia.org/wiki/Wireless_access_point) collection application.
+[Wireless Access Point](https://en.wikipedia.org/wiki/Wireless_access_point) collection application for [Mellow Wombat](https://github.com/guycole/mellow-wombat) crates.
 
 ## Introduction
 A Mellow Heeler client observes [wireless beacons](https://en.wikipedia.org/wiki/Beacon_frame) and shares the observation w/a backend for storage and reporting.
 
-Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augmented w/a USB WiFi adapter such as [TP Link AC1300](https://www.tp-link.com/us/home-networking/usb-adapter/archer-t3u-plus/).
+Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augmented w/a USB WiFi adapter such as [TP Link AC1300](https://www.tp-link.com/us/home-networking/usb-adapter/archer-t3u-plus/) because the onboard WiFi performance is poor.  
 
-## Notes
-1. Autonomous collection of wireless beacons for 2.4 and 5 GHz using the iwlist(8) utility.
+[Mellow Peccary](https://github.com/guycole/mellow-peccary) hosts provide the provide the long term storage and analysis of Heeler observations.
 
-2. Each observation produces two output files: a copy of the current iwlist(8) output and a json summary of key features extracted from the iwlist(8) output along with observation metadata.
+## Mellow Wombat services
+1. Time synchronization and internet gateway access.
 
-3. iwlist(8) must run from root crontab(1)
+2. There is bootboy support for dynamic configuration of the collector, but a heeler typically will only have the USB WiFi adapter and not have a RTL-SDR radio connected.  Note that bootboy produces config.yaml which the collector relies upon.
 
-4. The collection pass runs from wombat crontab(1)
+3. Format validation of observation files.
 
-5. Output file directory is defined within config.yaml
+4. Sharing latest observation with [Mellow Koala](https://github.com/guycole/mellow-koala).
+
+5. Batching observation files into compressed tar files and uploading to AWS S3
+
+## Mellow Peccary services
+1. Long term storage and analysis of Heeler observations
+
+## Collection cycle
+1. Autonomous collection of wireless beacons for 2.4 and 5 GHz using the iwlist(8) utility [iwlist-scan.sh](https://github.com/guycole/mellow-heeler-v2/blob/main/bin/iwlist-scan.sh) (must run as root).
+
+2. [collector.sh](https://github.com/guycole/mellow-heeler-v2/blob/main/bin/collector.sh) is invoked from the wombat crontab(1).  Each observation produces two output files: a copy of the current iwlist(8) raw output and a json summary of key features extracted from the iwlist(8) output along with observation metadata.
+
+3. The two output files are placed in the "fresh" directory where rsync(1) will move from collector to gateway.  "Fresh" file directory is defined within config.yaml
 
 ## Sample JSON output
 ```
@@ -31,16 +43,19 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
         "altitude": MSL in meters
         "latitude": +north decimal degress
         "longitude": +east decimal degrees
-        "site": site name
+        "siteName": site name
+    },
+    "job": {
+        "mode": "iwlist",
+        "project": "heeler-v2",
+        "task": "heeler-v2-iwlist"
     },
     "timeStamp": {
         "epochSeconds": collection time in seconds since epoch
         "iso8601": epochSeconds as a ISO861 string
     },
-    "crate": "wombat04",
+    "crateName": "wombat04",
     "fileName": file name
-    "mode": collection application (currently only "iwlist")
-    "project": source project (currently "heeler-v2")
     "version": schema version (currently 1)
     "observations": [
         {
@@ -54,3 +69,21 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
     ]
 }
 ```
+
+## Wombat validation cycle
+Validation is performed on the wombat gateway by [wombat_docker](https://github.com/guycole/mellow-heeler-v2/tree/main/src/wombat_docker).  
+
+If both the "json" and "raw" files are present on the Wombat gateway, the json file is tested for readability and json schema correctness.  Failed files are moved to the "failure" directory and a successful files go to "heeler/succcess" for additional processing.  
+
+wombat_docker also updates postgres tables to keep simple statistics on collection.
+
+### Mellow Koala cycle
+[Mellow Koala](https://github.com/guycole/mellow-koala) is only concerned about the most recent load cycle.  Every validation pass should find the most recent observation to write to "heeler/koala" and then invoke [heeler-koala-import.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-koala-import.sh) to consume the latest observation.
+
+## Wombat archival cycle
+[heeler-archive.sh](https://github.com/guycole/mellow-wombat/blob/main/bin/heeler-archive.sh) collects the files from "heeler/success" and saves a tar file with both the json and raw files into the "heeler/archive" directory, then saves a tar file with only the json files into the "heeler/export" directory.  Export files are written to S3 and then deleted, while archive files remain indefinately.  
+
+## Peccary import cycle
+Peccary loading is performed by [peccary_docker](https://github.com/guycole/mellow-heeler-v2/tree/main/src/peccary_docker).  All of the collected observation is stored in postgres for future analysis.
+
+Peccary imports heeler tar files from AWS S3 to load.
