@@ -11,6 +11,7 @@ hostname=$(hostname)
 logger -p local3.info "collector heeler $hostname"
 #
 WORK_DIR="$HOME/github/mellow-heeler-v2/src/collector"
+PYTHONPATH="$HOME/github/mellow-heeler-v2/src"; export PYTHONPATH
 #
 echo "start collector"
 sleep 13

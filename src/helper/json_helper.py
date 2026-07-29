@@ -106,6 +106,12 @@ class JsonHelper:
 
     def json_file_writer(self, file_name: str, json_data: dict[str, any]) -> bool:
         try:
+            validate(instance=json_data, schema=schema)
+        except Exception as error:
+            logger.error(f"json validation failed for {file_name}: {error.message}")
+            return False
+
+        try:
             with open(file_name, "w") as out_file:
                 json.dump(json_data, out_file, indent=4)
         except Exception as error:

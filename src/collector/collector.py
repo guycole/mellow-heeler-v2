@@ -6,7 +6,6 @@
 #
 
 import datetime
-import json
 import logging
 import socket
 import sys
@@ -14,6 +13,7 @@ import time
 import uuid
 import zoneinfo
 
+from helper.json_helper import JsonHelper
 from parser import Parser
 
 import yaml
@@ -47,13 +47,6 @@ class Collector:
             with open(source_file, "r") as in_file:
                 with open(dest_file, "w") as out_file:
                     out_file.writelines(in_file.readlines())
-        except Exception as error:
-            logger.error(error)
-
-    def json_file_writer(self, file_name: str, json_data: dict[str, any]) -> None:
-        try:
-            with open(file_name, "w") as out_file:
-                json.dump(json_data, out_file, indent=4)
         except Exception as error:
             logger.error(error)
 
@@ -105,7 +98,7 @@ class Collector:
             "observations": observations,
         }
 
-        self.json_file_writer(outfile_json, results)
+        JsonHelper().json_file_writer(outfile_json, results)
 
 
 #
