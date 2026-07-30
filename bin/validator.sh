@@ -12,7 +12,7 @@ echo "start validate"
 docker rm heeler-validate;docker run -v /var/wombat:/mnt/wombat --name heeler-validate heeler:latest
 #
 docker rm heeler-koala;docker run -e stuntbox=koala -v /var/wombat:/mnt/wombat --name heeler-koala heeler:latest
-$HOME/github/mellow-wombat/bin/heeler-koala-import.sh
+$HOME/github/mellow-heeler-v2/bin/koala-import.sh
 #
 echo "end validate"
 #
