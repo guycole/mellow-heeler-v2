@@ -1,31 +1,11 @@
 #
 # Build from the src/ directory (one level above this file):
-# docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) -f peccary_docker/Dockerfile -t heeler:latest .
-# docker run -v /var/peccary:/mnt/peccary --name peccary peccary:latest
+# docker build -f peccary_docker/Dockerfile -t peccary:latest .
+# docker run -e WOMBAT_UID=<uid> -e WOMBAT_GID=<gid> -v /var/peccary:/mnt/peccary --name peccary peccary:latest
 #
 FROM python:3.11-slim
 
 WORKDIR /app
-
-# Require wombat UID/GID to be provided by the Linux build host.
-ARG WOMBAT_UID
-ARG WOMBAT_GID
-
-RUN set -eux; \
-	test -n "${WOMBAT_UID}"; \
-	test -n "${WOMBAT_GID}"
-
-RUN printf '%s\n' '#!/bin/sh' 'set -eu' \
-	'uid="${WOMBAT_UID:?WOMBAT_UID is required}"' \
-	'gid="${WOMBAT_GID:?WOMBAT_GID is required}"' \
-	'printf "WOMBAT_UID=%s\nWOMBAT_GID=%s\n" "$uid" "$gid" > /app/wombat_env.env' \
-	> /usr/local/bin/collect-wombat-ids.sh \
-	&& chmod +x /usr/local/bin/collect-wombat-ids.sh
-
-ENV WOMBAT_UID=${WOMBAT_UID}
-ENV WOMBAT_GID=${WOMBAT_GID}
-
-RUN /usr/local/bin/collect-wombat-ids.sh
 
 # Create and activate virtualenv first
 RUN python -m venv /app/venv
@@ -40,7 +20,10 @@ COPY helper/ ./helper/
 COPY peccary_docker/heeler_app.py ./
 COPY peccary_docker/loader.py ./
 
-RUN printf '%s\n' '#!/bin/sh' 'set -e' '/usr/local/bin/collect-wombat-ids.sh' 'set -a' '[ -f /app/wombat_env.env ] && . /app/wombat_env.env' 'set +a' 'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
+RUN printf '%s\n' '#!/bin/sh' 'set -eu' \
+	': "${WOMBAT_UID:?WOMBAT_UID is required}"' \
+	': "${WOMBAT_GID:?WOMBAT_GID is required}"' \
+	'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
 	&& chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV FAILURE_DIR=/mnt/peccary/heeler/failure
