@@ -37,7 +37,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/peccary
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/peccary-heeler
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -84,7 +84,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/wombat
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/wombat-heeler
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}

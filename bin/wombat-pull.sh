@@ -9,7 +9,7 @@ PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #
 REGISTRY="ghcr.io"
 OWNER="guycole"
-IMAGE="wombat"
+IMAGE="wombat-heeler"
 TAG="latest"
 #
 echo "pulling ${REGISTRY}/${OWNER}/${IMAGE}:${TAG}"

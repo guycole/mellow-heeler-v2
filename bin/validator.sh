@@ -7,8 +7,8 @@
 #
 PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 #
-CONTAINER="heeler-validate"
-IMAGE="ghcr.io/guycole/wombat:latest"
+CONTAINER="wombat-heeler"
+IMAGE="ghcr.io/guycole/wombat-heeler:latest"
 #
 WOMBAT_UID=$(id -u wombat)
 WOMBAT_GID=$(id -g wombat)
