@@ -123,7 +123,7 @@ class Validator:
 
         if os.path.getsize(file_name1) < 1 or os.path.getsize(file_name2) < 1:
             logger.warning(f"skipping empty file(s):{file_name1} {file_name2}")
-            self.file_failure(file_name1, file_name2)
+            self.file_failure2(file_name1, file_name2)
             return
 
         test_file_name = file_name1 if file_name1.endswith(".json") else file_name2
@@ -164,6 +164,8 @@ class Validator:
             # valid files will arrive in pairs
             target1 = targets[ndx1]
             target2 = targets[ndx1 + 1]
+
+            print(f"test: {target1}, {target2}")
 
             temp = target1.split(".")
             if target2.startswith(temp[0]):
