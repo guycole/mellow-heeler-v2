@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Title: wombat-to-s3.sh
-# Description: copy heeler files local file system to s3
+# Description: move heeler files local file system to s3
 # Development Environment: Ubuntu 22.04.05 LTS
 # Author: Guy Cole (guycole at gmail dot com)
 #
@@ -15,7 +15,7 @@ WORK_DIR="/var/wombat/heeler"
 #
 DEST_BUCKET=s3://mellow-heeler-uw2-k2718.braingang.net/fresh/
 #
-echo "start s3 copy"
+echo "start s3 move"
 cd "${WORK_DIR}/${EXPORT_DIR}" || exit 1
 
 if aws s3 mv . "$DEST_BUCKET" --recursive --profile="$HOST_NAME"; then
