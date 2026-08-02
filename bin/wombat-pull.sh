@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Title: wombat_pull.sh
+# Title: wombat-pull.sh
 # Description: Pull the latest wombat docker image
 # Development Environment: ubuntu 22.4.5 LTS
 # Author: Guy Cole (guycole at gmail dot com)
