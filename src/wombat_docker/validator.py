@@ -165,8 +165,6 @@ class Validator:
             target1 = targets[ndx1]
             target2 = targets[ndx1 + 1]
 
-            print(f"test: {target1}, {target2}")
-
             temp = target1.split(".")
             if target2.startswith(temp[0]):
                 self.file_processor(target1, target2)

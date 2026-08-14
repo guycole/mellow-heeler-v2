@@ -17,7 +17,7 @@ from yaml.loader import SafeLoader
 
 class BootBoy:
 
-    def configuration(self, target: str) -> dict[str, any]:
+    def configuration(self, target: str) -> str:
         print(f"BootBoy: configuring {target}")
 
         # Build the path to the admin JSON file
@@ -65,9 +65,7 @@ class BootBoy:
             print(f"Error writing config.yaml: {e}")
             sys.exit(1)
 
-        return {
-            "receiver_task": receiver.get("task", "xxx"),
-        }
+        return receiver.get("task", "xxx")
 
     def crontab(self) -> None:
         import subprocess
@@ -87,7 +85,7 @@ class BootBoy:
             print(f"Error updating wombat's crontab: {e}")
 
     def execute(self, target: str) -> None:
-        self.configuration(target)
+        task = self.configuration(target)
         self.crontab()
 
 
