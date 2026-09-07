@@ -9,6 +9,8 @@ import datetime
 import json
 import os
 
+from typing import Any
+
 from helper.json_helper import JsonHelper, schema
 
 from helper.postgres import PostGres
@@ -110,10 +112,17 @@ class Loader:
                 }
 
                 self.postgres.observation_insert(candidate)
+
+                bssid_score = {
+                    "bssid": obs["bssid"],
+                    "quantity": 1,
+                }
+
+                self.postgres.bssid_score_insert_or_update(bssid_score)
         except Exception as error:
             logger.error(f"failed to load observations: {error}")
 
-    def make_wap_from_obs(self, obs: dict[str, any], version: int) -> dict[str, any]:
+    def make_wap_from_obs(self, obs: dict[str, Any], version: int) -> dict[str, Any]:
         bssid = obs["bssid"].lower()
         return {
             "bssid": bssid.strip(),
@@ -125,7 +134,7 @@ class Loader:
             "version": version,
         }
 
-    def match_wap(self, wap1: dict[str, any], wap2: dict[str, any]) -> bool:
+    def match_wap(self, wap1: dict[str, Any], wap2: dict[str, Any]) -> bool:
         return (
             wap1["frequency_mhz"] == wap2["frequency_mhz"]
             and wap1["ssid"] == wap2["ssid"]
@@ -179,6 +188,8 @@ class Loader:
                 logger.error(f"failed to load wap: {error}")
 
     def file_processor(self, file_name) -> None:
+        logger.info(f"processing file: {file_name}")
+
         if os.path.isfile(file_name) is False:
             logger.warning(f"skipping non-file:{file_name}")
             self.file_failure(file_name)

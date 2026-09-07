@@ -20,16 +20,11 @@ COPY helper/ ./helper/
 COPY peccary_docker/heeler_app.py ./
 COPY peccary_docker/loader.py ./
 
-RUN printf '%s\n' '#!/bin/sh' 'set -eu' \
-	': "${WOMBAT_UID:?WOMBAT_UID is required}"' \
-	': "${WOMBAT_GID:?WOMBAT_GID is required}"' \
-	'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
-	&& chmod +x /usr/local/bin/docker-entrypoint.sh
-
 ENV FAILURE_DIR=/mnt/peccary/heeler/failure
 ENV FRESH_DIR=/mnt/peccary/heeler/heeler-v2
 
 # On Linux (production): override with -e DB_CONN=...@172.17.0.1:5432/heeler
+# ENV DB_CONN=postgresql+psycopg2://heeler_client:batabat@172.17.0.1:5432/heeler
 # On macOS (Docker Desktop): host.docker.internal resolves to the host machine
 ENV DB_CONN=postgresql+psycopg2://heeler_client:batabat@host.docker.internal:5432/heeler
 

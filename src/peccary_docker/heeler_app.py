@@ -26,7 +26,7 @@ class HeelerApp:
 
         self.db_conn = os.environ.get(
             "DB_CONN",
-            "postgresql+psycopg2://heeler_client:batabat@localhost:5432/heeler",
+            "postgresql+psycopg2://heeler_client:batabat@host.docker.internal:5432/heeler"
         )
 
         db_engine = create_engine(self.db_conn, echo=False)

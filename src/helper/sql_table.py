@@ -18,6 +18,20 @@ mapper_registry = registry()
 class Base(DeclarativeBase):
     pass
 
+class BssidScore(Base):
+    __tablename__ = "heeler_bssid_score"
+
+    id = Column(BigInteger, primary_key=True)
+    bssid = Column(String)
+    quantity = Column(Integer)
+
+    def __init__(self, args: dict[str, any]):
+        self.bssid = args["bssid"]
+        self.quantity = args["quantity"]
+
+    def __repr__(self):
+        return f"bssid_score({self.bssid} {self.quantity})"
+
 class DailyScore(Base):
     __tablename__ = "heeler_daily_score"
 

@@ -12,6 +12,7 @@ export PGHOST=localhost
 export PGPASSWORD=woofwoof
 export PGUSER=heeler_admin
 #
+psql < bssid_score.psql
 psql < daily_score.psql
 psql < geo_loc.psql
 psql < load_log.psql

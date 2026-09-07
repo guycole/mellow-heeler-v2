@@ -20,6 +20,7 @@ from sqlalchemy import select
 from sqlalchemy import desc
 
 from .sql_table import (
+    BssidScore,
     DailyScore,
     GeoLoc,
     LoadLog,
@@ -33,6 +34,28 @@ class PostGres:
 
     def __init__(self, session: sqlalchemy.orm.session.sessionmaker):
         self.Session = session
+
+    def bssid_score_insert_or_update(self, args: dict[str, any]) -> BssidScore:
+        candidate = BssidScore(args)
+
+        try:
+            with self.Session() as session:
+                existing = session.scalars(
+                    select(BssidScore).filter(
+                        and_(BssidScore.bssid == candidate.bssid,)
+                    )
+                ).first()
+
+                if existing is None:
+                    session.add(candidate)
+                else:
+                    existing.quantity += candidate.quantity
+
+                session.commit()
+        except Exception as error:
+            print(error)
+
+        return candidate
 
     def daily_score_insert_or_update(self, args: dict[str, any]) -> DailyScore:
         candidate = DailyScore(args)
