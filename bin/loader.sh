@@ -10,9 +10,9 @@ PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 hostname=$(hostname)
 logger -p local3.info "heeler loader $hostname"
 #
-echo "start loader"
+echo "start load"
 #
 docker rm heeler;docker run -v /var/peccary/heeler:/mnt/peccary/heeler --name heeler heeler:latest
 #
-echo "end loader"
+echo "end load"
 #

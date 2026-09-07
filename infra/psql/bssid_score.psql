@@ -1,0 +1,15 @@
+--
+-- Title: bssid_score.psql
+-- Description: bssid bins
+--
+-- bssid is wap id
+-- quantity is total observations
+--
+create table heeler_bssid_score (
+  id        bigserial    primary key,
+  bssid     varchar(24)  unique not null,
+  quantity  integer      not null
+);
+
+grant select, insert, update, delete on heeler_bssid_score to heeler_client;
+grant usage, select on sequence heeler_bssid_score_id_seq to heeler_client;

@@ -25,4 +25,4 @@ else
 	exit 1
 fi
 
-echo "end s3 copy"
+echo "end s3 move"

@@ -13,7 +13,7 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
 
 2. There is bootboy support for dynamic configuration of the collector, but a heeler typically will only have the USB WiFi adapter and not have a RTL-SDR radio connected.  Note that bootboy produces config.yaml which the collector relies upon.
 
-3. Format validation of observation files.
+3. Format validation of observation files (wombat_docker).
 
 4. Sharing latest observation with [Mellow Koala](https://github.com/guycole/mellow-koala).
 
@@ -78,20 +78,9 @@ If both the "json" and "raw" files are present on the Wombat gateway, the json f
 
 wombat_docker also updates postgres tables to keep simple statistics on collection.
 
-[validator.sh](https://github.com/guycole/mellow-heeler-v2/blob/main/bin/validator.sh) is invoked from the wombat crontab and is the correct way to run the validator — it wraps the `docker run` invocation below.
+[validator.sh](https://github.com/guycole/mellow-heeler-v2/blob/main/bin/validator.sh) is invoked from the wombat crontab and is the correct way to run the validator.
 
-Build and run from the `src/` directory:
-```sh
-# build
-docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) \
-  -f wombat_docker/Dockerfile -t wombat:latest .
-
-# run validator
-docker run -e stuntbox=validator -v /var/wombat:/mnt/wombat --name wombat wombat:latest
-
-# run koala
-docker run -e stuntbox=koala --name wombat wombat:latest
-```
+Upload to s3: archiver.sh, then wombat-to-s3.sh
 
 ### Mellow Koala cycle
 [Mellow Koala](https://github.com/guycole/mellow-koala) is only concerned about the most recent load cycle.  Every validation pass should find the most recent observation to write to "heeler/koala" and then invoke [koala-import.sh](https://github.com/guycole/mellow-heeler-v2/blob/main/bin/koala-import.sh) to consume the latest observation.
@@ -102,14 +91,4 @@ docker run -e stuntbox=koala --name wombat wombat:latest
 ## Peccary import cycle
 Peccary loading is performed by [peccary_docker](https://github.com/guycole/mellow-heeler-v2/tree/main/src/peccary_docker).  All of the collected observation is stored in postgres for future analysis.
 
-Peccary imports heeler tar files from AWS S3 to load.
-
-Build and run from the `src/` directory:
-```sh
-# build
-docker build --build-arg WOMBAT_UID=$(id -u wombat) --build-arg WOMBAT_GID=$(id -g wombat) \
-  -f peccary_docker/Dockerfile -t peccary:latest .
-
-# run
-docker run -v /var/peccary:/mnt/peccary --name peccary peccary:latest
-```
+Download from S3: s3-to-peccary.sh, then unpacker.sh and loader.sh

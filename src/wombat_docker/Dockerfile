@@ -1,7 +1,7 @@
 #
 # Build from the src/ directory (one level above this file):
 # docker build -f wombat_docker/Dockerfile -t wombat:latest .
-# docker run -e WOMBAT_UID=<uid> -e WOMBAT_GID=<gid> -v /var/wombat:/mnt/wombat --name wombat wombat:latest
+# docker run -v /var/wombat:/mnt/wombat --name wombat wombat:latest
 # docker run -e stuntbox=validator -e WOMBAT_UID=<uid> -e WOMBAT_GID=<gid> -v /var/wombat:/mnt/wombat --name wombat wombat:latest
 # docker run -e stuntbox=koala -e WOMBAT_UID=<uid> -e WOMBAT_GID=<gid> --name wombat wombat:latest
 #
@@ -22,12 +22,6 @@ COPY helper/ ./helper/
 COPY wombat_docker/heeler_app.py ./
 COPY wombat_docker/koala.py ./
 COPY wombat_docker/validator.py ./
-
-RUN printf '%s\n' '#!/bin/sh' 'set -eu' \
-	': "${WOMBAT_UID:?WOMBAT_UID is required}"' \
-	': "${WOMBAT_GID:?WOMBAT_GID is required}"' \
-	'exec "$@"' > /usr/local/bin/docker-entrypoint.sh \
-	&& chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV FAILURE_DIR=/mnt/wombat/failure
 ENV FRESH_DIR=/mnt/wombat/fresh/heeler
