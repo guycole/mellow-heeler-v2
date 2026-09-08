@@ -29,5 +29,4 @@ ENV FRESH_DIR=/mnt/peccary/heeler/heeler-v2
 ENV DB_CONN=postgresql+psycopg2://heeler_client:batabat@host.docker.internal:5432/heeler
 
 RUN mkdir -p /mnt/peccary
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["python", "heeler_app.py"]
+ENTRYPOINT ["python", "heeler_app.py"]

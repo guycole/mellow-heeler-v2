@@ -32,5 +32,4 @@ ENV SUCCESS_DIR=/mnt/wombat/heeler/success
 ENV DB_CONN=postgresql+psycopg2://heeler_client:batabat@172.17.0.1:5432/heeler
 
 RUN mkdir -p /mnt/wombat
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["python", "heeler_app.py"]
+ENTRYPOINT ["python", "heeler_app.py"]
