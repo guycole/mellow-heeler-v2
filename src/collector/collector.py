@@ -7,7 +7,6 @@
 
 import datetime
 import logging
-from turtle import st
 import pydantic
 import socket
 import sys
