@@ -7,6 +7,7 @@
 
 import datetime
 import logging
+from turtle import st
 import pydantic
 import socket
 import sys
@@ -34,20 +35,46 @@ class GeoLoc(pydantic.BaseModel):
     longitude: float
     siteName: str
 
+class Job(pydantic.BaseModel):
+    mode: str
+    project: str
+    task: str
+
+class Observation(pydantic.BaseModel):
+    bssid: str
+    capabilities: str
+    cipherType: str
+    frequencyMhz: int
+    signalDbm: int
+    ssid: str
+
 class Receiver(pydantic.BaseModel):
     antenna: str
     receiverId: int
     task: str
     type: str
 
+class TimeStamp(pydantic.BaseModel):
+    epochSeconds: int = pydantic.Field(default_factory=lambda: int(time.time()))
+    iso8601: str = ""
+
+    @pydantic.model_validator(mode="after")
+    def sync_iso8601_from_epoch(self) -> "TimeStamp":
+        self.iso8601 = datetime.datetime.fromtimestamp(
+            self.epochSeconds, tz=zoneinfo.ZoneInfo("UTC")
+        ).isoformat()
+        return self
+
 class HeelerModel(pydantic.BaseModel):
     crateName: str
-    freshDir: str
-    gpsEnable: bool
-    equipment: dict[str, str]
-    geoLoc: dict[str, Any]
-    receiver: dict[str, str]
-    scanFile: str
+    fileName: str
+    version: int = 2
+    equipment: Equipment
+    geoLoc: GeoLoc
+    job: Job
+    receiver: Receiver
+    timeStamp: TimeStamp
+    observations: list[Observation]
 
 class Collector:
     def __init__(self, args: dict[str, Any]):
@@ -56,11 +83,10 @@ class Collector:
         self.gps_enable = args["gpsEnable"]
 
         self.equipment = Equipment(**args["equipment"])
+        self.job = Job(mode="iwlist", project="heeler-v2", task="heeler-v2-iwlist")
         self.geo_loc = GeoLoc(**args["geoLoc"])
         self.receiver = Receiver(**args["receiver"])
-        print(self.equipment)
-        print(self.geo_loc)
-        print(self.receiver)
+        self.time_stamp = TimeStamp()
 
         self.host_name = args["equipment"]["hostName"]
         self.host_type = args["equipment"]["hostType"]
@@ -75,6 +101,7 @@ class Collector:
         self.receiver_task = args["receiver"]["task"]
         self.receiver_type = args["receiver"]["type"]
 
+    # copy the original iwlist file to fresh directory
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
         try:
             with open(source_file, "r") as in_file:
@@ -97,12 +124,22 @@ class Collector:
         parser = Parser()
         observations = parser.execute(file_name)
 
-        epoch_seconds = int(time.time())
-        dt_object_utc = datetime.datetime.fromtimestamp(
-            epoch_seconds, tz=zoneinfo.ZoneInfo("UTC")
+        time_stamp = TimeStamp()
+
+        heeler_model = HeelerModel(
+            crateName = self.crate_name,
+            fileName = f"{base_file_name}.json",
+            equipment=self.equipment,
+            geoLoc=self.geo_loc,
+            job=self.job,
+            receiver=self.receiver,
+            timeStamp=time_stamp,
+            observations=observations,
         )
 
-        results = {
+        print(heeler_model.model_dump_json(indent=4))
+
+        results2 = {
             "equipment": {
                 "antenna": self.antenna,
                 "receiverId": self.receiver_id,
@@ -122,8 +159,8 @@ class Collector:
                 "task": "heeler-v2-iwlist",
             },
             "timeStamp": {
-                "epochSeconds": epoch_seconds,
-                "iso8601": dt_object_utc.isoformat(),
+                "epochSeconds": time_stamp.epochSeconds,
+                "iso8601": time_stamp.iso8601,
             },
             "crateName": self.crate_name,
             "fileName": f"{base_file_name}.json",
@@ -131,7 +168,7 @@ class Collector:
             "observations": observations,
         }
 
-        JsonHelper().json_file_writer(outfile_json, results)
+#        JsonHelper().json_file_writer(outfile_json, results)
 
 
 #
