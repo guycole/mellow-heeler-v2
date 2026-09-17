@@ -7,11 +7,13 @@
 
 import datetime
 import logging
+import pydantic
 import socket
 import sys
 import time
 import uuid
 import zoneinfo
+from typing import Any
 
 from helper.json_helper import JsonHelper
 from parser import Parser
@@ -22,25 +24,56 @@ from yaml.loader import SafeLoader
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("heeler")
 
+class Equipment(pydantic.BaseModel):
+    hostName: str
+    hostType: str
+
+class GeoLoc(pydantic.BaseModel):
+    altitude: float
+    latitude: float
+    longitude: float
+    siteName: str
+
+class Receiver(pydantic.BaseModel):
+    antenna: str
+    receiverId: int
+    task: str
+    type: str
+
+class HeelerModel(pydantic.BaseModel):
+    crateName: str
+    freshDir: str
+    gpsEnable: bool
+    equipment: dict[str, str]
+    geoLoc: dict[str, Any]
+    receiver: dict[str, str]
+    scanFile: str
 
 class Collector:
-    def __init__(self, args: dict[str, any]):
+    def __init__(self, args: dict[str, Any]):
         self.crate_name = args["crateName"]
-        self.fresh_dir = configuration["freshDir"]
-        self.gps_enable = configuration["gpsEnable"]
+        self.fresh_dir = args["freshDir"]
+        self.gps_enable = args["gpsEnable"]
 
-        self.host_name = configuration["equipment"]["hostName"]
-        self.host_type = configuration["equipment"]["hostType"]
+        self.equipment = Equipment(**args["equipment"])
+        self.geo_loc = GeoLoc(**args["geoLoc"])
+        self.receiver = Receiver(**args["receiver"])
+        print(self.equipment)
+        print(self.geo_loc)
+        print(self.receiver)
 
-        self.altitude = configuration["geoLoc"]["altitude"]
-        self.latitude = configuration["geoLoc"]["latitude"]
-        self.longitude = configuration["geoLoc"]["longitude"]
-        self.site_name = configuration["geoLoc"]["siteName"]
+        self.host_name = args["equipment"]["hostName"]
+        self.host_type = args["equipment"]["hostType"]
 
-        self.antenna = configuration["receiver"]["antenna"]
-        self.receiver_id = configuration["receiver"]["receiverId"]
-        self.receiver_task = configuration["receiver"]["task"]
-        self.receiver_type = configuration["receiver"]["type"]
+        self.altitude = args["geoLoc"]["altitude"]
+        self.latitude = args["geoLoc"]["latitude"]
+        self.longitude = args["geoLoc"]["longitude"]
+        self.site_name = args["geoLoc"]["siteName"]
+
+        self.antenna = args["receiver"]["antenna"]
+        self.receiver_id = args["receiver"]["receiverId"]
+        self.receiver_task = args["receiver"]["task"]
+        self.receiver_type = args["receiver"]["type"]
 
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
         try:
