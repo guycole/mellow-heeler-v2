@@ -77,7 +77,7 @@ class Parser:
             cipher_type = None
 
         cell["capabilities"] = capabilities
-        cell["cipher_type"] = cipher_type
+        cell["cipherType"] = cipher_type
         return cell
 
     def parser(self, raw_buffer: list[str]) -> list[dict[str, Any]]:
@@ -96,11 +96,11 @@ class Parser:
 
                 current = {
                     "bssid": match.group(1).upper(),
-                    "frequency_mhz": None,
-                    "signal_dbm": None,
+                    "frequencyMhz": None,
+                    "signalDbm": None,
                     "ssid": None,
                     "capabilities": None,
-                    "cipher_type": None,
+                    "cipherType": None,
                     "_encryption_key": None,
                     "_rsn": None,
                     "_wpa": None,
@@ -127,13 +127,13 @@ class Parser:
             if "Frequency:" in line:
                 mhz = self._parse_frequency_mhz(line)
                 if mhz is not None:
-                    current["frequency_mhz"] = mhz
+                    current["frequencyMhz"] = mhz
                 continue
 
             if "Signal level=" in line:
                 match = re.search(r"Signal level=\s*(-?\d+)\s*dBm", line)
                 if match:
-                    current["signal_dbm"] = int(match.group(1))
+                    current["signalDbm"] = int(match.group(1))
                 continue
 
             if "ESSID:" in line:
