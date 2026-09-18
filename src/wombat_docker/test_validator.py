@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SRC_DIR = REPO_ROOT / "src"
@@ -43,8 +45,8 @@ class FakePostGres:
         self.daily_score_payloads.append(payload)
 
 
-def _load_sample_json() -> dict:
-    sample_file = REPO_ROOT / "samples" / "fe1e8800-97f6-43fe-b601-cbc15b4ddb93.json"
+def _load_sample_json(sample_name: str) -> dict:
+    sample_file = REPO_ROOT / "samples" / sample_name
     return json.loads(sample_file.read_text(encoding="utf-8"))
 
 
@@ -70,8 +72,16 @@ def _make_dirs(tmp_path: Path):
     return fresh_dir, success_dir, failure_dir
 
 
-def test_file_processor_valid_pair_writes_postgres_and_moves_to_success(tmp_path, monkeypatch):
-    payload = _load_sample_json()
+@pytest.mark.parametrize(
+    "sample_name",
+    [
+        "09ee27f4-0b2b-4d26-a180-03860c80c282.json",
+    ],
+)
+def test_file_processor_valid_pair_writes_postgres_and_moves_to_success(
+    tmp_path, monkeypatch, sample_name
+):
+    payload = _load_sample_json(sample_name)
     json_name, raw_name = _write_test_pair(tmp_path, payload, "scan-valid")
     fresh_dir, success_dir, failure_dir = _make_dirs(tmp_path)
 
@@ -109,7 +119,7 @@ def test_file_processor_valid_pair_writes_postgres_and_moves_to_success(tmp_path
 
 
 def test_file_processor_mismatched_json_filename_moves_to_failure(tmp_path, monkeypatch):
-    payload = _load_sample_json()
+    payload = _load_sample_json("09ee27f4-0b2b-4d26-a180-03860c80c282.json")
     json_name, raw_name = _write_test_pair(tmp_path, payload, "scan-mismatch")
     fresh_dir, success_dir, failure_dir = _make_dirs(tmp_path)
 
@@ -141,7 +151,7 @@ def test_file_processor_mismatched_json_filename_moves_to_failure(tmp_path, monk
 
 
 def test_file_processor_duplicate_file_moves_to_failure_without_new_inserts(tmp_path, monkeypatch):
-    payload = _load_sample_json()
+    payload = _load_sample_json("09ee27f4-0b2b-4d26-a180-03860c80c282.json")
     json_name, raw_name = _write_test_pair(tmp_path, payload, "scan-duplicate")
     fresh_dir, success_dir, failure_dir = _make_dirs(tmp_path)
 
@@ -150,6 +160,33 @@ def test_file_processor_duplicate_file_moves_to_failure_without_new_inserts(tmp_
     monkeypatch.setenv("FAILURE_DIR", str(failure_dir))
 
     fake_postgres = FakePostGres(already_processed=True)
+    validator = validator_module.Validator(fake_postgres)
+
+    previous_dir = os.getcwd()
+    os.chdir(tmp_path)
+    try:
+        validator.file_processor(json_name, raw_name)
+    finally:
+        os.chdir(previous_dir)
+
+    assert validator.success == 0
+    assert validator.failure == 2
+    assert (failure_dir / json_name).exists()
+    assert (failure_dir / raw_name).exists()
+    assert len(fake_postgres.load_log_insert_payloads) == 0
+    assert len(fake_postgres.daily_score_payloads) == 0
+
+
+def test_file_processor_rejects_v1_payload(tmp_path, monkeypatch):
+    payload = _load_sample_json("fe1e8800-97f6-43fe-b601-cbc15b4ddb93.json")
+    json_name, raw_name = _write_test_pair(tmp_path, payload, "scan-v1")
+    fresh_dir, success_dir, failure_dir = _make_dirs(tmp_path)
+
+    monkeypatch.setenv("FRESH_DIR", str(fresh_dir))
+    monkeypatch.setenv("SUCCESS_DIR", str(success_dir))
+    monkeypatch.setenv("FAILURE_DIR", str(failure_dir))
+
+    fake_postgres = FakePostGres(already_processed=False)
     validator = validator_module.Validator(fake_postgres)
 
     previous_dir = os.getcwd()

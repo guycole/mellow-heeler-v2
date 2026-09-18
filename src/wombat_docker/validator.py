@@ -6,10 +6,9 @@
 #
 import logging
 import datetime
-import json
 import os
 
-from helper.json_helper import JsonHelper, schema
+from helper.json_helper import JsonHelper
 
 from helper.postgres import PostGres
 
@@ -30,6 +29,54 @@ class Validator:
         self.success = 0
 
         self.jh = JsonHelper()
+
+    def _file_name_matches(self, payload_file_name: str, test_file_name: str) -> bool:
+        if payload_file_name == test_file_name:
+            return True
+
+        return os.path.basename(payload_file_name) == os.path.basename(test_file_name)
+
+    def _is_supported_v2_payload(self) -> bool:
+        payload = self.jh.raw_json
+
+        if payload.get("version") != 2:
+            return False
+
+        job = payload.get("job", {})
+        if job.get("project") != "heeler-v2":
+            return False
+
+        required_top_level = {
+            "crateName",
+            "fileName",
+            "version",
+            "equipment",
+            "geoLoc",
+            "job",
+            "receiver",
+            "timeStamp",
+            "observations",
+        }
+        if not required_top_level.issubset(payload.keys()):
+            return False
+
+        observations = payload.get("observations")
+        if not isinstance(observations, list):
+            return False
+
+        if len(observations) > 0:
+            required_obs_keys = {
+                "bssid",
+                "capabilities",
+                "cipherType",
+                "frequencyMhz",
+                "signalDbm",
+                "ssid",
+            }
+            if not required_obs_keys.issubset(observations[0].keys()):
+                return False
+
+        return True
 
     def file_failure(self, file_name: str):
         logger.info(f"file failure:{file_name}")
@@ -127,23 +174,18 @@ class Validator:
             return
 
         test_file_name = file_name1 if file_name1.endswith(".json") else file_name2
-        if not self.jh.json_file_reader(test_file_name, True):
+        if not self.jh.json_file_reader(test_file_name, False):
             logger.warning(f"json file read/verify failure for {test_file_name}")
             self.file_failure2(file_name1, file_name2)
             return
 
-        if self.jh.raw_json["fileName"] != test_file_name:
+        if not self._file_name_matches(self.jh.raw_json["fileName"], test_file_name):
             logger.warning(f"mismatched file name: {self.jh.raw_json['fileName']} vs {test_file_name}")
             self.file_failure2(file_name1, file_name2)
             return
 
-        if (
-            self.jh.raw_json["version"] == 1
-            and self.jh.raw_json["job"]["project"] == "heeler-v2"
-        ):
-            pass
-        else:
-            logger.warning(f"invalid version or project for {test_file_name}")
+        if not self._is_supported_v2_payload():
+            logger.warning(f"invalid v2 payload for {test_file_name}")
             self.file_failure2(file_name1, file_name2)
             return
 
