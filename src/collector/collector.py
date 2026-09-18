@@ -14,7 +14,6 @@ import uuid
 import zoneinfo
 from typing import Any
 
-from helper.json_helper import JsonHelper
 from parser import Parser
 
 import yaml
@@ -93,19 +92,6 @@ class Collector:
 
         self.time_stamp = TimeStamp()
 
-        self.host_name = args["equipment"]["hostName"]
-        self.host_type = args["equipment"]["hostType"]
-
-        self.altitude = args["geoLoc"]["altitude"]
-        self.latitude = args["geoLoc"]["latitude"]
-        self.longitude = args["geoLoc"]["longitude"]
-        self.site_name = args["geoLoc"]["siteName"]
-
-        self.antenna = args["receiver"]["antenna"]
-        self.receiver_id = args["receiver"]["receiverId"]
-        self.receiver_task = args["receiver"]["task"]
-        self.receiver_type = args["receiver"]["type"]
-
     # copy the original iwlist file to fresh directory
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
         try:
@@ -129,9 +115,9 @@ class Collector:
         parser = Parser()
         observations = parser.execute(file_name)
 
-        xx = []
+        obs_list = []
         for obs in observations:
-            xx.append(Observation(**obs))
+            obs_list.append(Observation(**obs))
 
         time_stamp = TimeStamp()
 
@@ -143,42 +129,11 @@ class Collector:
             job=self.job,
             receiver=self.receiver,
             timeStamp=time_stamp,
-            observations=xx,
+            observations=obs_list,
         )
 
-        print(heeler_model.model_dump_json(indent=4))
-
-        results2 = {
-            "equipment": {
-                "antenna": self.antenna,
-                "receiverId": self.receiver_id,
-                "receiverType": self.receiver_type,
-                "hostName": self.host_name,
-                "hostType": self.host_type,
-            },
-            "geoLoc": {
-                "altitude": self.altitude,
-                "latitude": self.latitude,
-                "longitude": self.longitude,
-                "siteName": self.site_name,
-            },
-            "job": {
-                "mode": "iwlist",
-                "project": "heeler-v2",
-                "task": "heeler-v2-iwlist",
-            },
-            "timeStamp": {
-                "epochSeconds": time_stamp.epochSeconds,
-                "iso8601": time_stamp.iso8601,
-            },
-            "crateName": self.crate_name,
-            "fileName": f"{base_file_name}.json",
-            "version": 1,
-            "observations": observations,
-        }
-
-#        JsonHelper().json_file_writer(outfile_json, results)
-
+        with open(outfile_json, "w", encoding="utf-8") as out_file:
+            out_file.write(heeler_model.model_dump_json(indent=4))
 
 #
 # argv[1] = configuration filename
