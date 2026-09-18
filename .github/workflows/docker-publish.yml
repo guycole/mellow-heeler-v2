@@ -1,6 +1,17 @@
 name: Publish Docker Images
 
 on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Which image to build
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - wombat
+          - peccary
   push:
     tags:
       - 'v*'
@@ -11,6 +22,7 @@ env:
 jobs:
   build-peccary:
     name: Build and push peccary
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.image == 'both' || github.event.inputs.image == 'peccary' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -58,6 +70,7 @@ jobs:
 
   build-wombat:
     name: Build and push wombat
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.image == 'both' || github.event.inputs.image == 'wombat' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
