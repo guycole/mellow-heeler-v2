@@ -123,6 +123,10 @@ class Collector:
         parser = Parser()
         observations = parser.execute(file_name)
 
+        xx = []
+        for obs in observations:
+            xx.append(Observation(**obs))
+
         time_stamp = TimeStamp()
 
         heeler_model = HeelerModel(
@@ -133,7 +137,7 @@ class Collector:
             job=self.job,
             receiver=self.receiver,
             timeStamp=time_stamp,
-            observations=observations,
+            observations=xx,
         )
 
         print(heeler_model.model_dump_json(indent=4))
