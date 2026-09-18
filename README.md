@@ -6,8 +6,6 @@ A Mellow Heeler client observes [wireless beacons](https://en.wikipedia.org/wiki
 
 Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augmented w/a USB WiFi adapter such as [TP Link AC1300](https://www.tp-link.com/us/home-networking/usb-adapter/archer-t3u-plus/) because the onboard WiFi performance is poor.  
 
-[Mellow Peccary](https://github.com/guycole/mellow-peccary) hosts provide the provide the long term storage and analysis of Heeler observations.
-
 ## Mellow Wombat services
 1. Time synchronization and internet gateway access.
 
@@ -20,7 +18,7 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
 5. Batching observation files into compressed tar files and uploading to AWS S3 (for archive and sharing with [Mellow Peccary](https://github.com/guycole/mellow-peccary)).
 
 ## Mellow Peccary services
-1. Long term storage and analysis of Heeler observations
+1. [Mellow Peccary](https://github.com/guycole/mellow-peccary) hosts provide the provide the long term storage and analysis of Heeler observations.
 
 ## Collection cycle
 1. Autonomous collection of wireless beacons for 2.4 and 5 GHz using the iwlist(8) utility [iwlist-scan.sh](https://github.com/guycole/mellow-heeler-v2/blob/main/bin/iwlist-scan.sh) (must run as root).
@@ -30,42 +28,53 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
 3. The two output files are placed in the "fresh" directory where rsync(1) will move from collector to gateway.  "Fresh" file directory is defined within config.yaml
 
 ## Sample JSON output
-[complete sample](https://github.com/guycole/mellow-heeler-v2/blob/readme_update/samples/fe1e8800-97f6-43fe-b601-cbc15b4ddb93.json)
+[complete sample](https://github.com/guycole/mellow-heeler-v2/blob/readme_update/samples/09ee27f4-0b2b-4d26-a180-03860c80c282.json)
 ```
 {
+    "crateName": "wombat04",
+    "fileName": "/var/wombat/fresh/heeler/09ee27f4-0b2b-4d26-a180-03860c80c282.json",
+    "version": 2,
     "equipment": {
-        "antenna": "whip",
-        "receiverId": 2,
-        "receiverType": "ac-1300",
         "hostName": "pi3b",
         "hostType": "rpi3"
     },
     "geoLoc": {
-        "altitude": MSL in meters
-        "latitude": +north decimal degress
-        "longitude": +east decimal degrees
-        "siteName": site name
+        "altitude": 0.0,         (MSL in meters)
+        "latitude": 38.108,      (+north decimal degrees)
+        "longitude": -122.268,   (+east decimal degrees)
+        "siteName": "vallejo01"  (site name)
     },
     "job": {
         "mode": "iwlist",
         "project": "heeler-v2",
         "task": "heeler-v2-iwlist"
     },
-    "timeStamp": {
-        "epochSeconds": collection time in seconds since epoch
-        "iso8601": epochSeconds as a ISO861 string
+    "receiver": {
+        "antenna": "whip",
+        "receiverId": 2,
+        "task": "heeler-v2-iwlist",
+        "type": "ac-1300"
     },
-    "crateName": "wombat04",
-    "fileName": file name
-    "version": schema version (currently 1)
+    "timeStamp": {
+        "epochSeconds": 1789696216,
+        "iso8601": "2026-09-18T01:50:16+00:00"
+    },
     "observations": [
         {
-            "bssid": "E2:BB:9E:D0:B0:30",
-            "frequency_mhz": 2437,
-            "signal_dbm": -75,
-            "ssid": "DIRECT-9ED03030",
+            "bssid": "3C:8C:F8:F9:2B:BB",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -70,
+            "ssid": "TRENDnet740_QCDJ"
+        },
+        {
+            "bssid": "A0:E7:AE:AF:65:60",
             "capabilities": "wpa2-psk",
-            "cipher_type": "CCMP"
+            "cipherType": "CCMP",
+            "frequencyMhz": 2452,
+            "signalDbm": -80,
+            "ssid": "ATTebV5XEa"
         }
     ]
 }

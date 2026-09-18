@@ -48,16 +48,16 @@ def test_init_maps_config_fields(tmp_path, monkeypatch):
     assert collector.crate_name == "wombat04"
     assert collector.fresh_dir == str(tmp_path)
     assert collector.gps_enable is False
-    assert collector.host_name == "pi3b"
-    assert collector.host_type == "rpi3"
-    assert collector.altitude == 0
-    assert collector.latitude == 38.108
-    assert collector.longitude == -122.268
-    assert collector.site_name == "vallejo01"
-    assert collector.antenna == "whip"
-    assert collector.receiver_id == 2
-    assert collector.receiver_task == "heeler-v2-iwlist"
-    assert collector.receiver_type == "ac-1300"
+    assert collector.equipment.hostName == "pi3b"
+    assert collector.equipment.hostType == "rpi3"
+    assert collector.geo_loc.altitude == 0
+    assert collector.geo_loc.latitude == 38.108
+    assert collector.geo_loc.longitude == -122.268
+    assert collector.geo_loc.siteName == "vallejo01"
+    assert collector.receiver.antenna == "whip"
+    assert collector.receiver.receiverId == 2
+    assert collector.receiver.task == "heeler-v2-iwlist"
+    assert collector.receiver.type == "ac-1300"
 
 
 def test_copy_raw_file_copies_contents(tmp_path, monkeypatch):
@@ -91,11 +91,11 @@ def test_execute_creates_json_and_raw_with_expected_payload(tmp_path, monkeypatc
     observations = [
         {
             "bssid": "94:18:65:F3:3A:76",
-            "frequency_mhz": 2447,
-            "signal_dbm": -57,
+            "frequencyMhz": 2447,
+            "signalDbm": -57,
             "ssid": "braingang2",
             "capabilities": "wpa2-psk",
-            "cipher_type": "CCMP",
+            "cipherType": "CCMP",
         }
     ]
 
@@ -117,10 +117,16 @@ def test_execute_creates_json_and_raw_with_expected_payload(tmp_path, monkeypatc
     payload = json.loads(json_file.read_text(encoding="utf-8"))
 
     assert payload["crateName"] == "wombat04"
-    assert payload["fileName"] == "11111111-2222-3333-4444-555555555555.json"
-    assert payload["version"] == 1
+    assert payload["fileName"] == str(json_file)
+    assert payload["version"] == 2
     assert payload["timeStamp"]["epochSeconds"] == 1784402415
     assert payload["timeStamp"]["iso8601"] == "2026-07-18T19:20:15+00:00"
+    assert payload["job"] == {
+        "mode": "iwlist",
+        "project": "heeler-v2",
+        "task": "heeler-v2-iwlist",
+    }
+    assert payload["receiver"]["receiverId"] == 2
     assert payload["observations"] == observations
 
 
@@ -140,11 +146,21 @@ def test_sample_json_shape_reference_matches_expected_keys():
     }
 
     first_observation = sample["observations"][0]
-    assert set(first_observation.keys()) == {
-        "bssid",
-        "frequency_mhz",
-        "signal_dbm",
-        "ssid",
-        "capabilities",
-        "cipher_type",
-    }
+    assert set(first_observation.keys()) in (
+        {
+            "bssid",
+            "frequencyMhz",
+            "signalDbm",
+            "ssid",
+            "capabilities",
+            "cipherType",
+        },
+        {
+            "bssid",
+            "frequency_mhz",
+            "signal_dbm",
+            "ssid",
+            "capabilities",
+            "cipher_type",
+        },
+    )
