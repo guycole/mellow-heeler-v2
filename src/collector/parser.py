@@ -37,14 +37,14 @@ class Parser:
         wpa = cell.pop("_wpa", None)
 
         capabilities: str
-        cipher_type: str = "None"
+        cipher_type: str = ""
 
         def _best_cipher(security: dict[str, Any]) -> str:
             pairwise = security.get("pairwise_ciphers") or []
             if pairwise:
                 return str(pairwise[0])
             group_cipher = security.get("group_cipher")
-            return str(group_cipher) if group_cipher else "None"
+            return str(group_cipher) if group_cipher else ""
 
         if rsn is not None:
             # WPA2 (RSN)
@@ -74,7 +74,7 @@ class Parser:
                 capabilities = "encrypted"
             else:
                 capabilities = "unknown"
-            cipher_type = "None"
+            cipher_type = ""
 
         cell["capabilities"] = capabilities
         cell["cipherType"] = cipher_type
@@ -98,7 +98,7 @@ class Parser:
                     "bssid": match.group(1).upper(),
                     "frequencyMhz": None,
                     "signalDbm": None,
-                    "ssid": None,
+                    "ssid": "",
                     "capabilities": None,
                     "cipherType": None,
                     "_encryption_key": None,
