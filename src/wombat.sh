@@ -9,5 +9,5 @@ PATH=/bin:/usr/bin:/etc:/usr/local/bin; export PATH
 PYTHONPATH=$(pwd); export PYTHONPATH
 #
 source wombat_docker/venv/bin/activate
-python wombat_docker/heeler_app.py
+wombat_docker/venv/bin/python wombat_docker/heeler_app.py
 #
