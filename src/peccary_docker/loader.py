@@ -6,12 +6,11 @@
 #
 import logging
 import datetime
-import json
 import os
 
 from typing import Any
 
-from helper.json_helper import JsonHelper, schema
+from helper.json_helper import JsonHelper
 
 from helper.postgres import PostGres
 
@@ -31,6 +30,29 @@ class Loader:
         self.success = 0
 
         self.jh = JsonHelper()
+
+    def _file_name_matches(self, payload_file_name: str, file_name: str) -> bool:
+        if payload_file_name == file_name:
+            return True
+
+        return os.path.basename(payload_file_name) == os.path.basename(file_name)
+
+    def _payload_version_supported(self) -> bool:
+        return (
+            self.jh.raw_json.get("version") in (1, 2)
+            and self.jh.raw_json.get("job", {}).get("project") == "heeler-v2"
+        )
+
+    def _obs_signal_dbm(self, obs: dict[str, Any]) -> int:
+        return obs["signal_dbm"] if "signal_dbm" in obs else obs["signalDbm"]
+
+    def _obs_frequency_mhz(self, obs: dict[str, Any]) -> int:
+        return (
+            obs["frequency_mhz"] if "frequency_mhz" in obs else obs["frequencyMhz"]
+        )
+
+    def _obs_cipher(self, obs: dict[str, Any]) -> str:
+        return (obs.get("cipher_type") or obs.get("cipherType") or "xstubx").strip()
 
     def file_failure(self, file_name: str):
         #        logger.info(f"file failure:{file_name}")
@@ -107,7 +129,7 @@ class Loader:
                     "bssid": obs["bssid"],
                     "load_log_id": self.load_log_id,
                     "obs_time": self.jh.raw_json["timeStamp"]["iso8601"],
-                    "signal_dbm": obs["signal_dbm"],
+                    "signal_dbm": self._obs_signal_dbm(obs),
                     "wap_id": wap_id,
                 }
 
@@ -127,8 +149,8 @@ class Loader:
         return {
             "bssid": bssid.strip(),
             "capability": obs["capabilities"].strip(),
-            "cipher": (obs.get("cipher_type") or "xstubx").strip(),
-            "frequency_mhz": obs["frequency_mhz"],
+            "cipher": self._obs_cipher(obs),
+            "frequency_mhz": self._obs_frequency_mhz(obs),
             "key": f"{bssid}_{version}",
             "ssid": (obs.get("ssid") or "xstubx").strip(),
             "version": version,
@@ -200,24 +222,19 @@ class Loader:
             self.file_failure(file_name)
             return
 
-        if not self.jh.json_file_reader(file_name, True):
+        if not self.jh.json_file_reader(file_name, False):
             logger.warning(f"json file read/verify failure for {file_name}")
             self.file_failure(file_name)
             return
 
-        if self.jh.raw_json["fileName"] != file_name:
+        if not self._file_name_matches(self.jh.raw_json["fileName"], file_name):
             logger.warning(
                 f"mismatched file name: {self.jh.raw_json['fileName']} vs {file_name}"
             )
             self.file_failure(file_name)
             return
 
-        if (
-            self.jh.raw_json["version"] == 1
-            and self.jh.raw_json["job"]["project"] == "heeler-v2"
-        ):
-            pass
-        else:
+        if not self._payload_version_supported():
             logger.warning(f"invalid version or project for {file_name}")
             self.file_failure(file_name)
             return

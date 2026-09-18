@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SRC_DIR = REPO_ROOT / "src"
@@ -92,8 +94,8 @@ class FakePostGres:
         self.bssid_score_payloads.append(payload)
 
 
-def _load_sample_json() -> dict:
-    sample_file = REPO_ROOT / "samples" / "fe1e8800-97f6-43fe-b601-cbc15b4ddb93.json"
+def _load_sample_json(sample_name: str) -> dict:
+    sample_file = REPO_ROOT / "samples" / sample_name
     return json.loads(sample_file.read_text(encoding="utf-8"))
 
 
@@ -105,8 +107,17 @@ def _write_json(tmp_path: Path, payload: dict, file_name: str) -> Path:
     return target
 
 
-def test_file_processor_valid_sample_loads_and_removes_file(tmp_path, monkeypatch):
-    payload = _load_sample_json()
+@pytest.mark.parametrize(
+    "sample_name",
+    [
+        "fe1e8800-97f6-43fe-b601-cbc15b4ddb93.json",
+        "09ee27f4-0b2b-4d26-a180-03860c80c282.json",
+    ],
+)
+def test_file_processor_valid_sample_loads_and_removes_file(
+    tmp_path, monkeypatch, sample_name
+):
+    payload = _load_sample_json(sample_name)
     json_name = "sample-valid.json"
     _write_json(tmp_path, payload, json_name)
 
@@ -142,7 +153,7 @@ def test_file_processor_valid_sample_loads_and_removes_file(tmp_path, monkeypatc
 
 
 def test_file_processor_mismatched_filename_moves_to_failure(tmp_path, monkeypatch):
-    payload = _load_sample_json()
+    payload = _load_sample_json("fe1e8800-97f6-43fe-b601-cbc15b4ddb93.json")
     json_name = "sample-mismatch.json"
     target = _write_json(tmp_path, payload, json_name)
 
@@ -198,6 +209,41 @@ def test_load_wap_creates_second_version_for_same_bssid_attribute_change(monkeyp
                 "ssid": "beta",
                 "capabilities": "wpa2-psk",
                 "cipher_type": "CCMP",
+            },
+        ]
+    }
+
+    loader.load_wap()
+
+    assert len(fake_postgres.wap_insert_payloads) == 2
+    versions = sorted([item["version"] for item in fake_postgres.wap_insert_payloads])
+    assert versions == [1, 2]
+
+
+def test_load_wap_accepts_v2_observation_keys(monkeypatch, tmp_path):
+    monkeypatch.setenv("FRESH_DIR", str(tmp_path))
+    monkeypatch.setenv("FAILURE_DIR", str(tmp_path / "failure"))
+
+    fake_postgres = FakePostGres()
+    loader = loader_module.Loader(fake_postgres)
+
+    loader.jh.raw_json = {
+        "observations": [
+            {
+                "bssid": "AA:BB:CC:DD:EE:FF",
+                "frequencyMhz": 2412,
+                "signalDbm": -50,
+                "ssid": "alpha",
+                "capabilities": "wpa2-psk",
+                "cipherType": "CCMP",
+            },
+            {
+                "bssid": "AA:BB:CC:DD:EE:FF",
+                "frequencyMhz": 2412,
+                "signalDbm": -51,
+                "ssid": "beta",
+                "capabilities": "wpa2-psk",
+                "cipherType": "CCMP",
             },
         ]
     }
