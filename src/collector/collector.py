@@ -123,7 +123,7 @@ class Collector:
 
         heeler_model = HeelerModel(
             crateName = self.crate_name,
-            fileName = f"{base_file_name}.json",
+            fileName = outfile_json,
             equipment=self.equipment,
             geoLoc=self.geo_loc,
             job=self.job,
