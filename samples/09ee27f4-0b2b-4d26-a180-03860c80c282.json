@@ -1,0 +1,920 @@
+{
+    "crateName": "wombat04",
+    "fileName": "/var/wombat/fresh/heeler/09ee27f4-0b2b-4d26-a180-03860c80c282.json",
+    "version": 2,
+    "equipment": {
+        "hostName": "pi3b",
+        "hostType": "rpi3"
+    },
+    "geoLoc": {
+        "altitude": 0.0,
+        "latitude": 38.108,
+        "longitude": -122.268,
+        "siteName": "vallejo01"
+    },
+    "job": {
+        "mode": "iwlist",
+        "project": "heeler-v2",
+        "task": "heeler-v2-iwlist"
+    },
+    "receiver": {
+        "antenna": "whip",
+        "receiverId": 2,
+        "task": "heeler-v2-iwlist",
+        "type": "ac-1300"
+    },
+    "timeStamp": {
+        "epochSeconds": 1789696216,
+        "iso8601": "2026-09-18T01:50:16+00:00"
+    },
+    "observations": [
+        {
+            "bssid": "7C:F1:7E:90:86:24",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2452,
+            "signalDbm": -41,
+            "ssid": "ATTebV5XEa_EXT"
+        },
+        {
+            "bssid": "1A:D9:5E:22:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -76,
+            "ssid": "S3ctorN1n3"
+        },
+        {
+            "bssid": "EE:E4:C9:22:E8:49",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -70,
+            "ssid": "Bonedaddys"
+        },
+        {
+            "bssid": "A4:01:DE:7D:FB:AA",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2432,
+            "signalDbm": -79,
+            "ssid": "Candyland"
+        },
+        {
+            "bssid": "04:17:B6:85:27:BB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -65,
+            "ssid": ""
+        },
+        {
+            "bssid": "3C:8C:F8:F9:2B:BB",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -70,
+            "ssid": "TRENDnet740_QCDJ"
+        },
+        {
+            "bssid": "A0:E7:AE:AF:65:60",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2452,
+            "signalDbm": -80,
+            "ssid": "ATTebV5XEa"
+        },
+        {
+            "bssid": "1E:9D:72:D4:22:5B",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -78,
+            "ssid": "Ben Dover"
+        },
+        {
+            "bssid": "3E:8C:F8:F9:2B:BB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -68,
+            "ssid": "Gate K"
+        },
+        {
+            "bssid": "1A:D9:5E:82:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -78,
+            "ssid": ""
+        },
+        {
+            "bssid": "16:01:DE:7D:FB:AA",
+            "capabilities": "wpa2-psk",
+            "cipherType": "unknown",
+            "frequencyMhz": 2432,
+            "signalDbm": -77,
+            "ssid": ""
+        },
+        {
+            "bssid": "EE:E4:C9:62:E8:49",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -72,
+            "ssid": ""
+        },
+        {
+            "bssid": "1A:D9:5E:52:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -78,
+            "ssid": ""
+        },
+        {
+            "bssid": "00:14:D1:D6:64:00",
+            "capabilities": "wpa2-psk",
+            "cipherType": "TKIP",
+            "frequencyMhz": 2442,
+            "signalDbm": -78,
+            "ssid": "MarinaGates"
+        },
+        {
+            "bssid": "EE:6E:FA:8B:9C:EB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -77,
+            "ssid": ""
+        },
+        {
+            "bssid": "7C:F1:7E:90:86:24",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2452,
+            "signalDbm": -62,
+            "ssid": "ATTebV5XEa_EXT"
+        },
+        {
+            "bssid": "7C:F1:7E:90:86:25",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5320,
+            "signalDbm": -37,
+            "ssid": "ATTebV5XEa_EXT"
+        },
+        {
+            "bssid": "A0:E7:AE:AF:65:60",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2452,
+            "signalDbm": -68,
+            "ssid": "ATTebV5XEa"
+        },
+        {
+            "bssid": "BC:9A:8E:B9:03:1C",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5540,
+            "signalDbm": -71,
+            "ssid": "Tank's WiFi"
+        },
+        {
+            "bssid": "BC:9A:8E:B9:03:1F",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5540,
+            "signalDbm": -78,
+            "ssid": ""
+        },
+        {
+            "bssid": "78:8A:20:AC:21:BE",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5280,
+            "signalDbm": -66,
+            "ssid": ""
+        },
+        {
+            "bssid": "A4:01:DE:7D:FB:AB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5765,
+            "signalDbm": -83,
+            "ssid": "Candyland"
+        },
+        {
+            "bssid": "1A:D9:5E:32:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5200,
+            "signalDbm": -59,
+            "ssid": "S3ctorN1n3"
+        },
+        {
+            "bssid": "EE:6E:FA:3B:9C:EB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5180,
+            "signalDbm": -62,
+            "ssid": "SVSeaTurtle"
+        },
+        {
+            "bssid": "1A:D9:5E:42:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5765,
+            "signalDbm": -62,
+            "ssid": "S3ctorN1n3"
+        },
+        {
+            "bssid": "1A:D9:5E:72:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5765,
+            "signalDbm": -62,
+            "ssid": ""
+        },
+        {
+            "bssid": "A6:E7:AE:AF:65:63",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5320,
+            "signalDbm": -74,
+            "ssid": "ATTebV5XEa"
+        },
+        {
+            "bssid": "2E:2C:51:38:D6:99",
+            "capabilities": "open",
+            "cipherType": "",
+            "frequencyMhz": 5240,
+            "signalDbm": -77,
+            "ssid": "STARLINK"
+        },
+        {
+            "bssid": "EE:E4:C9:32:E8:49",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5765,
+            "signalDbm": -64,
+            "ssid": "Bonedaddys"
+        },
+        {
+            "bssid": "1E:9D:72:DB:22:5C",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -78,
+            "ssid": "Ben Dover"
+        },
+        {
+            "bssid": "1E:9D:72:DB:22:5E",
+            "capabilities": "open",
+            "cipherType": "",
+            "frequencyMhz": 5785,
+            "signalDbm": -78,
+            "ssid": "xfinitywifi"
+        },
+        {
+            "bssid": "1E:9D:72:DB:22:58",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -74,
+            "ssid": "Xfinity Mobile"
+        },
+        {
+            "bssid": "1A:D9:5E:22:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -71,
+            "ssid": "S3ctorN1n3"
+        },
+        {
+            "bssid": "16:01:DE:7D:FB:AB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "unknown",
+            "frequencyMhz": 5765,
+            "signalDbm": -82,
+            "ssid": ""
+        },
+        {
+            "bssid": "EE:E4:C9:52:E8:49",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5765,
+            "signalDbm": -62,
+            "ssid": ""
+        },
+        {
+            "bssid": "B4:A2:5C:9D:8F:50",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5620,
+            "signalDbm": -82,
+            "ssid": "The Mare Island Company"
+        },
+        {
+            "bssid": "B4:A2:5C:9D:8F:51",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5620,
+            "signalDbm": -86,
+            "ssid": ""
+        },
+        {
+            "bssid": "EE:6E:FA:7B:9C:EB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5745,
+            "signalDbm": -70,
+            "ssid": ""
+        },
+        {
+            "bssid": "1A:D9:5E:52:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -60,
+            "ssid": ""
+        },
+        {
+            "bssid": "1E:9D:72:D4:22:5B",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -68,
+            "ssid": "Ben Dover"
+        },
+        {
+            "bssid": "B4:A2:5C:9D:B2:D0",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5320,
+            "signalDbm": -83,
+            "ssid": "The Mare Island Company"
+        },
+        {
+            "bssid": "A0:E7:AE:AF:65:63",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5320,
+            "signalDbm": -78,
+            "ssid": ""
+        },
+        {
+            "bssid": "3C:78:95:F8:5B:C4",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5745,
+            "signalDbm": -80,
+            "ssid": "TP-Link_5BC3_5G"
+        },
+        {
+            "bssid": "C2:EA:57:7F:B3:53",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -85,
+            "ssid": ""
+        },
+        {
+            "bssid": "EE:6E:FA:6B:9C:EB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5180,
+            "signalDbm": -63,
+            "ssid": ""
+        },
+        {
+            "bssid": "E4:38:83:E1:CF:00",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5180,
+            "signalDbm": -81,
+            "ssid": "483swNorth"
+        },
+        {
+            "bssid": "F2:79:0A:61:EA:2A",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5220,
+            "signalDbm": -79,
+            "ssid": "Xfinity Mobile"
+        },
+        {
+            "bssid": "A6:05:D6:0C:78:1A",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5700,
+            "signalDbm": -81,
+            "ssid": ""
+        },
+        {
+            "bssid": "1E:9D:72:DB:22:59",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -76,
+            "ssid": ""
+        },
+        {
+            "bssid": "1E:9D:72:DB:22:5A",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -78,
+            "ssid": ""
+        },
+        {
+            "bssid": "38:94:ED:19:B0:CA",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -84,
+            "ssid": ""
+        },
+        {
+            "bssid": "1A:D9:5E:82:70:EF",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -60,
+            "ssid": ""
+        },
+        {
+            "bssid": "16:01:DE:7D:FB:AA",
+            "capabilities": "wpa2-psk",
+            "cipherType": "unknown",
+            "frequencyMhz": 2432,
+            "signalDbm": -69,
+            "ssid": ""
+        },
+        {
+            "bssid": "1E:9D:72:D4:22:59",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -69,
+            "ssid": ""
+        },
+        {
+            "bssid": "EE:E4:C9:22:E8:49",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -65,
+            "ssid": "Bonedaddys"
+        },
+        {
+            "bssid": "F8:79:0A:61:EA:2A",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5220,
+            "signalDbm": -66,
+            "ssid": "Houston  Control"
+        },
+        {
+            "bssid": "F6:79:0A:61:EA:2A",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5220,
+            "signalDbm": -66,
+            "ssid": ""
+        },
+        {
+            "bssid": "EA:79:0A:61:EA:2A",
+            "capabilities": "open",
+            "cipherType": "",
+            "frequencyMhz": 5220,
+            "signalDbm": -66,
+            "ssid": "xfinitywifi"
+        },
+        {
+            "bssid": "B8:8C:2B:92:E5:16",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5240,
+            "signalDbm": -79,
+            "ssid": "GodsMyPeace"
+        },
+        {
+            "bssid": "30:CB:C7:2E:24:11",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5560,
+            "signalDbm": -85,
+            "ssid": ""
+        },
+        {
+            "bssid": "18:60:41:E4:4F:62",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5745,
+            "signalDbm": -68,
+            "ssid": "TMOBILE-4F5F"
+        },
+        {
+            "bssid": "36:70:4E:DD:0C:49",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5805,
+            "signalDbm": -86,
+            "ssid": ""
+        },
+        {
+            "bssid": "3E:8C:F8:F9:2B:BB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -58,
+            "ssid": "Gate K"
+        },
+        {
+            "bssid": "C0:94:35:07:64:F3",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5220,
+            "signalDbm": -83,
+            "ssid": "OswaldKnows"
+        },
+        {
+            "bssid": "D6:94:35:07:64:F3",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5220,
+            "signalDbm": -84,
+            "ssid": ""
+        },
+        {
+            "bssid": "2E:2C:51:58:D6:99",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5240,
+            "signalDbm": -78,
+            "ssid": ""
+        },
+        {
+            "bssid": "D6:8C:2B:92:E5:16",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5240,
+            "signalDbm": -81,
+            "ssid": ""
+        },
+        {
+            "bssid": "BC:A9:93:34:DC:E0",
+            "capabilities": "open",
+            "cipherType": "",
+            "frequencyMhz": 5300,
+            "signalDbm": -85,
+            "ssid": "VallejoPublicWireless"
+        },
+        {
+            "bssid": "BC:A9:93:34:DC:E1",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5300,
+            "signalDbm": -84,
+            "ssid": ""
+        },
+        {
+            "bssid": "B4:A2:5C:9D:86:70",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5640,
+            "signalDbm": -85,
+            "ssid": "The Mare Island Company"
+        },
+        {
+            "bssid": "9C:05:D6:0C:78:1A",
+            "capabilities": "open",
+            "cipherType": "",
+            "frequencyMhz": 5700,
+            "signalDbm": -84,
+            "ssid": "Knot Bad Guest"
+        },
+        {
+            "bssid": "A2:05:D6:0C:78:1A",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5700,
+            "signalDbm": -82,
+            "ssid": "Knot Bad"
+        },
+        {
+            "bssid": "AA:05:D6:0C:78:1A",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5700,
+            "signalDbm": -81,
+            "ssid": ""
+        },
+        {
+            "bssid": "EE:6E:FA:4B:9C:EB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5745,
+            "signalDbm": -69,
+            "ssid": "SVSeaTurtle"
+        },
+        {
+            "bssid": "18:60:41:36:C6:4B",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5745,
+            "signalDbm": -78,
+            "ssid": "TMOBILE-C648"
+        },
+        {
+            "bssid": "7A:54:25:7A:8D:28",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -87,
+            "ssid": ""
+        },
+        {
+            "bssid": "28:70:4E:C2:9B:15",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5825,
+            "signalDbm": -84,
+            "ssid": "AP-du6Aj-B15"
+        },
+        {
+            "bssid": "04:17:B6:85:27:BB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -62,
+            "ssid": ""
+        },
+        {
+            "bssid": "A4:01:DE:7D:FB:AA",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2432,
+            "signalDbm": -67,
+            "ssid": "Candyland"
+        },
+        {
+            "bssid": "18:60:41:36:C6:4A",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2422,
+            "signalDbm": -68,
+            "ssid": "TMOBILE-C648"
+        },
+        {
+            "bssid": "1A:60:41:76:C6:4A",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2422,
+            "signalDbm": -70,
+            "ssid": ""
+        },
+        {
+            "bssid": "1E:9D:72:D4:22:5C",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -68,
+            "ssid": ""
+        },
+        {
+            "bssid": "5E:7D:7D:2E:A0:7B",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -78,
+            "ssid": "Vallejo"
+        },
+        {
+            "bssid": "C8:99:B2:C1:E5:01",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -77,
+            "ssid": "TMOBILE-E4FF"
+        },
+        {
+            "bssid": "8C:8B:5B:4B:81:AA",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2437,
+            "signalDbm": -79,
+            "ssid": "Verizon_3DSP6V"
+        },
+        {
+            "bssid": "0C:9D:92:02:41:C8",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2447,
+            "signalDbm": -80,
+            "ssid": "J.A.R.V.I.S"
+        },
+        {
+            "bssid": "EE:E4:C9:42:E8:49",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -65,
+            "ssid": ""
+        },
+        {
+            "bssid": "C4:EB:39:36:3F:A7",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2452,
+            "signalDbm": -80,
+            "ssid": "TMOBILE"
+        },
+        {
+            "bssid": "F8:79:0A:61:EA:29",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -74,
+            "ssid": "Houston  Control"
+        },
+        {
+            "bssid": "B4:A2:5C:9D:8F:41",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -71,
+            "ssid": ""
+        },
+        {
+            "bssid": "EE:E4:C9:62:E8:49",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -64,
+            "ssid": ""
+        },
+        {
+            "bssid": "EE:6E:FA:2B:9C:EB",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2462,
+            "signalDbm": -68,
+            "ssid": "SVSeaTurtle"
+        },
+        {
+            "bssid": "B6:95:75:64:4B:73",
+            "capabilities": "open",
+            "cipherType": "",
+            "frequencyMhz": 5180,
+            "signalDbm": -82,
+            "ssid": "MIBREW_GUEST"
+        },
+        {
+            "bssid": "BA:95:75:64:4B:73",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5180,
+            "signalDbm": -83,
+            "ssid": ""
+        },
+        {
+            "bssid": "58:60:D8:73:2D:D3",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5180,
+            "signalDbm": -75,
+            "ssid": ""
+        },
+        {
+            "bssid": "F4:92:BF:BA:76:97",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5180,
+            "signalDbm": -84,
+            "ssid": ""
+        },
+        {
+            "bssid": "C2:EA:57:3F:B3:53",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5180,
+            "signalDbm": -80,
+            "ssid": "Endurance"
+        },
+        {
+            "bssid": "0C:7C:28:2F:D0:E0",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5260,
+            "signalDbm": -84,
+            "ssid": "ATTYI8yedr"
+        },
+        {
+            "bssid": "30:CB:C7:2E:24:10",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5560,
+            "signalDbm": -85,
+            "ssid": "The Mare Island Company"
+        },
+        {
+            "bssid": "50:27:A9:D0:F6:24",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5560,
+            "signalDbm": -84,
+            "ssid": "a60ec4"
+        },
+        {
+            "bssid": "50:27:A9:D0:F6:28",
+            "capabilities": "open",
+            "cipherType": "",
+            "frequencyMhz": 5560,
+            "signalDbm": -85,
+            "ssid": ""
+        },
+        {
+            "bssid": "50:27:A9:D0:F6:26",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5560,
+            "signalDbm": -85,
+            "ssid": "114 Wifi"
+        },
+        {
+            "bssid": "B4:A2:5C:9D:86:71",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5640,
+            "signalDbm": -86,
+            "ssid": ""
+        },
+        {
+            "bssid": "94:18:65:CE:96:95",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -86,
+            "ssid": ""
+        },
+        {
+            "bssid": "76:54:25:7A:8D:28",
+            "capabilities": "wpa2",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -90,
+            "ssid": ""
+        },
+        {
+            "bssid": "C2:EA:57:4F:B3:53",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5785,
+            "signalDbm": -84,
+            "ssid": "Endurance"
+        },
+        {
+            "bssid": "9C:05:D6:F6:E4:5B",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5825,
+            "signalDbm": -86,
+            "ssid": "AP-8vYpa-45B"
+        },
+        {
+            "bssid": "00:0D:97:0B:72:A0",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 5825,
+            "signalDbm": -86,
+            "ssid": ""
+        },
+        {
+            "bssid": "78:8A:20:24:5E:A6",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -85,
+            "ssid": "VYC-Secure"
+        },
+        {
+            "bssid": "B4:A2:5C:9D:86:60",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -75,
+            "ssid": "The Mare Island Company"
+        },
+        {
+            "bssid": "B4:A2:5C:9D:86:61",
+            "capabilities": "wpa2-psk",
+            "cipherType": "CCMP",
+            "frequencyMhz": 2412,
+            "signalDbm": -73,
+            "ssid": ""
+        }
+    ]
+}
