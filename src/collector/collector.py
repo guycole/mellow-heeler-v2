@@ -89,7 +89,7 @@ class Collector:
         tokens = project.split("-")
         mode = tokens[-1]
         task = "-".join(tokens[:-1])
-        self.job = Job(mode=mode, project="heeler-v2", task=task)
+        self.job = Job(mode=mode, project=project, task=task)
 
         self.time_stamp = TimeStamp()
 
