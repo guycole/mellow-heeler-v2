@@ -8,7 +8,6 @@
 import datetime
 import logging
 import pydantic
-import socket
 import sys
 import time
 import uuid
@@ -82,9 +81,16 @@ class Collector:
         self.gps_enable = args["gpsEnable"]
 
         self.equipment = Equipment(**args["equipment"])
-        self.job = Job(mode="iwlist", project="heeler-v2", task="heeler-v2-iwlist")
         self.geo_loc = GeoLoc(**args["geoLoc"])
         self.receiver = Receiver(**args["receiver"])
+
+        # heeler-v2-iwlist
+        project = args["receiver"]["task"]
+        tokens = project.split("-")
+        mode = tokens[-1]
+        task = "-".join(tokens[:-1])
+        self.job = Job(mode=mode, project="heeler-v2", task=task)
+
         self.time_stamp = TimeStamp()
 
         self.host_name = args["equipment"]["hostName"]
