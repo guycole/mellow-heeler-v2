@@ -7,13 +7,13 @@
 
 import datetime
 import logging
-import socket
+import pydantic
 import sys
 import time
 import uuid
 import zoneinfo
+from typing import Any
 
-from helper.json_helper import JsonHelper
 from parser import Parser
 
 import yaml
@@ -22,26 +22,77 @@ from yaml.loader import SafeLoader
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("heeler")
 
+class Equipment(pydantic.BaseModel):
+    hostName: str
+    hostType: str
+
+class GeoLoc(pydantic.BaseModel):
+    altitude: float
+    latitude: float
+    longitude: float
+    siteName: str
+
+class Job(pydantic.BaseModel):
+    mode: str
+    project: str
+    task: str
+
+class Observation(pydantic.BaseModel):
+    bssid: str
+    capabilities: str
+    cipherType: str
+    frequencyMhz: int
+    signalDbm: int
+    ssid: str
+
+class Receiver(pydantic.BaseModel):
+    antenna: str
+    receiverId: int
+    task: str
+    type: str
+
+class TimeStamp(pydantic.BaseModel):
+    epochSeconds: int = pydantic.Field(default_factory=lambda: int(time.time()))
+    iso8601: str = ""
+
+    @pydantic.model_validator(mode="after")
+    def sync_iso8601_from_epoch(self) -> "TimeStamp":
+        self.iso8601 = datetime.datetime.fromtimestamp(
+            self.epochSeconds, tz=zoneinfo.ZoneInfo("UTC")
+        ).isoformat()
+        return self
+
+class HeelerModel(pydantic.BaseModel):
+    crateName: str
+    fileName: str
+    version: int = 2
+    equipment: Equipment
+    geoLoc: GeoLoc
+    job: Job
+    receiver: Receiver
+    timeStamp: TimeStamp
+    observations: list[Observation]
 
 class Collector:
-    def __init__(self, args: dict[str, any]):
+    def __init__(self, args: dict[str, Any]):
         self.crate_name = args["crateName"]
-        self.fresh_dir = configuration["freshDir"]
-        self.gps_enable = configuration["gpsEnable"]
+        self.fresh_dir = args["freshDir"]
+        self.gps_enable = args["gpsEnable"]
 
-        self.host_name = configuration["equipment"]["hostName"]
-        self.host_type = configuration["equipment"]["hostType"]
+        self.equipment = Equipment(**args["equipment"])
+        self.geo_loc = GeoLoc(**args["geoLoc"])
+        self.receiver = Receiver(**args["receiver"])
 
-        self.altitude = configuration["geoLoc"]["altitude"]
-        self.latitude = configuration["geoLoc"]["latitude"]
-        self.longitude = configuration["geoLoc"]["longitude"]
-        self.site_name = configuration["geoLoc"]["siteName"]
+        # heeler-v2-iwlist
+        task = args["receiver"]["task"]
+        tokens = task.split("-")
+        mode = tokens[-1]
+        project = "-".join(tokens[:-1])
+        self.job = Job(mode=mode, project=project, task=task)
 
-        self.antenna = configuration["receiver"]["antenna"]
-        self.receiver_id = configuration["receiver"]["receiverId"]
-        self.receiver_task = configuration["receiver"]["task"]
-        self.receiver_type = configuration["receiver"]["type"]
+        self.time_stamp = TimeStamp()
 
+    # copy the original iwlist file to fresh directory
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
         try:
             with open(source_file, "r") as in_file:
@@ -64,42 +115,25 @@ class Collector:
         parser = Parser()
         observations = parser.execute(file_name)
 
-        epoch_seconds = int(time.time())
-        dt_object_utc = datetime.datetime.fromtimestamp(
-            epoch_seconds, tz=zoneinfo.ZoneInfo("UTC")
+        obs_list = []
+        for obs in observations:
+            obs_list.append(Observation(**obs))
+
+        time_stamp = TimeStamp()
+
+        heeler_model = HeelerModel(
+            crateName = self.crate_name,
+            fileName = outfile_json,
+            equipment=self.equipment,
+            geoLoc=self.geo_loc,
+            job=self.job,
+            receiver=self.receiver,
+            timeStamp=time_stamp,
+            observations=obs_list,
         )
 
-        results = {
-            "equipment": {
-                "antenna": self.antenna,
-                "receiverId": self.receiver_id,
-                "receiverType": self.receiver_type,
-                "hostName": self.host_name,
-                "hostType": self.host_type,
-            },
-            "geoLoc": {
-                "altitude": self.altitude,
-                "latitude": self.latitude,
-                "longitude": self.longitude,
-                "siteName": self.site_name,
-            },
-            "job": {
-                "mode": "iwlist",
-                "project": "heeler-v2",
-                "task": "heeler-v2-iwlist",
-            },
-            "timeStamp": {
-                "epochSeconds": epoch_seconds,
-                "iso8601": dt_object_utc.isoformat(),
-            },
-            "crateName": self.crate_name,
-            "fileName": f"{base_file_name}.json",
-            "version": 1,
-            "observations": observations,
-        }
-
-        JsonHelper().json_file_writer(outfile_json, results)
-
+        with open(outfile_json, "w", encoding="utf-8") as out_file:
+            out_file.write(heeler_model.model_dump_json(indent=4))
 
 #
 # argv[1] = configuration filename
