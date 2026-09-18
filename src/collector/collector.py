@@ -85,10 +85,10 @@ class Collector:
         self.receiver = Receiver(**args["receiver"])
 
         # heeler-v2-iwlist
-        project = args["receiver"]["task"]
-        tokens = project.split("-")
+        task = args["receiver"]["task"]
+        tokens = task.split("-")
         mode = tokens[-1]
-        task = "-".join(tokens[:-1])
+        project = "-".join(tokens[:-1])
         self.job = Job(mode=mode, project=project, task=task)
 
         self.time_stamp = TimeStamp()
