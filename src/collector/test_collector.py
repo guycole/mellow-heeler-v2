@@ -78,6 +78,7 @@ def test_copy_raw_file_copies_contents(tmp_path, monkeypatch):
 def test_execute_creates_json_and_raw_with_expected_payload(tmp_path, monkeypatch):
     cfg = make_configuration(tmp_path)
     monkeypatch.setattr(collector_module, "configuration", cfg, raising=False)
+    monkeypatch.setattr(collector_module.time, "time", lambda: 1784402415)
 
     collector = collector_module.Collector(cfg)
 
@@ -86,7 +87,6 @@ def test_execute_creates_json_and_raw_with_expected_payload(tmp_path, monkeypatc
 
     fixed_uuid = uuid.UUID("11111111-2222-3333-4444-555555555555")
     monkeypatch.setattr(collector_module.uuid, "uuid4", lambda: fixed_uuid)
-    monkeypatch.setattr(collector_module.time, "time", lambda: 1784402415)
 
     observations = [
         {

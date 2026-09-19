@@ -82,6 +82,7 @@ class Collector:
         self.equipment = Equipment(**args["equipment"])
         self.geo_loc = GeoLoc(**args["geoLoc"])
         self.receiver = Receiver(**args["receiver"])
+        self.time_stamp = TimeStamp()
 
         # heeler-v2-iwlist
         task = args["receiver"]["task"]
@@ -89,8 +90,6 @@ class Collector:
         mode = tokens[-1]
         project = "-".join(tokens[:-1])
         self.job = Job(mode=mode, project=project, task=task)
-
-        self.time_stamp = TimeStamp()
 
     # copy the original iwlist file to fresh directory
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
@@ -119,8 +118,6 @@ class Collector:
         for obs in observations:
             obs_list.append(Observation(**obs))
 
-        time_stamp = TimeStamp()
-
         heeler_model = HeelerModel(
             crateName = self.crate_name,
             fileName = outfile_json,
@@ -128,7 +125,7 @@ class Collector:
             geoLoc=self.geo_loc,
             job=self.job,
             receiver=self.receiver,
-            timeStamp=time_stamp,
+            timeStamp=self.time_stamp,
             observations=obs_list,
         )
 
