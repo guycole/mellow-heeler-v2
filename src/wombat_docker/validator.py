@@ -7,6 +7,7 @@
 import logging
 import datetime
 import os
+from abc import ABC, abstractmethod
 
 from helper.json_helper import JsonHelper
 
@@ -16,7 +17,33 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 logger = logging.getLogger("validator")
 
 
-class Validator:
+class ValidatorBase(ABC):
+    @abstractmethod
+    def file_failure(self, file_name: str) -> None:
+        pass
+
+    @abstractmethod
+    def file_failure2(self, file_name1: str, file_name2: str) -> None:
+        pass
+
+    @abstractmethod
+    def file_success2(self, file_name1: str, file_name2: str) -> None:
+        pass
+
+    @abstractmethod
+    def load_log_test(self, test_file_name: str) -> bool:
+        pass
+
+    @abstractmethod
+    def file_processor(self, file_name1: str, file_name2: str) -> None:
+        pass
+
+    @abstractmethod
+    def execute(self) -> int:
+        pass
+
+
+class HeelerValidator(ValidatorBase):
 
     def __init__(self, postgres: PostGres):
         self.postgres = postgres
@@ -30,110 +57,96 @@ class Validator:
 
         self.jh = JsonHelper()
 
-    def _file_name_matches(self, payload_file_name: str, test_file_name: str) -> bool:
-        if payload_file_name == test_file_name:
-            return True
+    def _group_pairs(
+        self, targets: list[str]
+    ) -> tuple[list[tuple[str, str]], list[str]]:
+        grouped = {}
+        for target in targets:
+            stem, _, _ = target.partition(".")
+            grouped.setdefault(stem, []).append(target)
 
-        return os.path.basename(payload_file_name) == os.path.basename(test_file_name)
+        pairs: list[tuple[str, str]] = []
+        orphans: list[str] = []
 
-    def _is_supported_v2_payload(self) -> bool:
-        payload = self.jh.raw_json
+        for stem in sorted(grouped.keys()):
+            members = sorted(grouped[stem])
+            json_files = [item for item in members if item.endswith(".json")]
+            non_json_files = [item for item in members if not item.endswith(".json")]
 
-        if payload.get("version") != 2:
-            return False
+            if len(json_files) == 1 and len(non_json_files) == 1:
+                pairs.append((json_files[0], non_json_files[0]))
+            else:
+                logger.warning("invalid file pair for stem:%s files:%s", stem, members)
+                orphans.extend(members)
 
-        job = payload.get("job", {})
-        if job.get("project") != "heeler-v2":
-            return False
+        return pairs, sorted(orphans)
 
-        required_top_level = {
-            "crateName",
-            "fileName",
-            "version",
-            "equipment",
-            "geoLoc",
-            "job",
-            "receiver",
-            "timeStamp",
-            "observations",
-        }
-        if not required_top_level.issubset(payload.keys()):
-            return False
-
-        observations = payload.get("observations")
-        if not isinstance(observations, list):
-            return False
-
-        if len(observations) > 0:
-            required_obs_keys = {
-                "bssid",
-                "capabilities",
-                "cipherType",
-                "frequencyMhz",
-                "signalDbm",
-                "ssid",
-            }
-            if not required_obs_keys.issubset(observations[0].keys()):
-                return False
-
-        return True
-
-    def file_failure(self, file_name: str):
-        logger.info(f"file failure:{file_name}")
+    def file_failure(self, file_name: str) -> None:
+        logger.info("file failure:%s", file_name)
 
         self.failure += 1
-        os.rename(file_name, self.failure_dir + "/" + file_name)
+        try:
+            os.rename(file_name, os.path.join(self.failure_dir, file_name))
+        except OSError as error:
+            logger.error("file move failure for %s: %s", file_name, error)
 
-    def file_failure2(self, file_name1: str, file_name2: str):
+    def file_failure2(self, file_name1: str, file_name2: str) -> None:
         self.file_failure(file_name1)
         self.file_failure(file_name2)
 
-    def file_success2(self, file_name1: str, file_name2: str):
-        # logger.info(f"file success:{file_name1}, {file_name2}")
-
+    def file_success2(self, file_name1: str, file_name2: str) -> None:
         self.success += 1
-        os.rename(file_name1, self.success_dir + "/" + file_name1)
-        os.rename(file_name2, self.success_dir + "/" + file_name2)
+        try:
+            os.rename(file_name1, os.path.join(self.success_dir, file_name1))
+            os.rename(file_name2, os.path.join(self.success_dir, file_name2))
+        except OSError as error:
+            logger.error(
+                "file move success-target failure for %s/%s: %s",
+                file_name1,
+                file_name2,
+                error,
+            )
 
     def load_log_test(self, test_file_name: str) -> bool:
-        logger.info(f"load_log_test for file: {test_file_name}")
+        logger.info("load_log_test for file: %s", test_file_name)
 
         try:
             candidate = self.postgres.load_log_select_by_file_name(test_file_name)
             if candidate is None:
-                logger.info(f"processing new file:{test_file_name}")
+                logger.info("processing new file:%s", test_file_name)
 
                 geo_loc = self.postgres.geo_loc_select_by_site(
                     self.jh.raw_json["geoLoc"]["siteName"]
                 )
                 if len(geo_loc) == 0:
                     logger.error(
-                        f"must insert geo_loc for site: {self.jh.raw_json['geoLoc']['siteName']}"
+                        "must insert geo_loc for site: %s",
+                        self.jh.raw_json["geoLoc"]["siteName"],
                     )
                     return False
 
                 load_log = {
-                    "crate_name": self.jh.raw_json["crateName"],
-                    "epoch_seconds": self.jh.raw_json["timeStamp"]["epochSeconds"],
-                    "file_name": test_file_name,
-                    "geo_loc_id": geo_loc[0].id,
-                    "host_name": self.jh.raw_json["equipment"]["hostName"],
-                    "load_time": datetime.datetime.now(),
+                    "crateName": self.jh.raw_json["crateName"],
+                    "epochSeconds": self.jh.raw_json["timeStamp"]["epochSeconds"],
+                    "fileName": test_file_name,
+                    "geoLocId": geo_loc[0].id,
+                    "hostName": self.jh.raw_json["equipment"]["hostName"],
+                    "loadTime": datetime.datetime.now(),
                     "mode": self.jh.raw_json["job"]["mode"],
-                    "obs_quantity": len(self.jh.raw_json["observations"]),
-                    "obs_time": self.jh.raw_json["timeStamp"]["iso8601"],
-                    "site_name": self.jh.raw_json["geoLoc"]["siteName"],
+                    "obsQuantity": len(self.jh.raw_json["observations"]),
+                    "obsTime": self.jh.raw_json["timeStamp"]["iso8601"],
+                    "siteName": self.jh.raw_json["geoLoc"]["siteName"],
                     "task": self.jh.raw_json["job"]["task"],
                 }
 
                 self.postgres.load_log_insert(load_log)
 
                 daily_score = {
-                    "crate_name": self.jh.raw_json["crateName"],
-                    "file_quantity": 1,
-                    "host_name": self.jh.raw_json["equipment"]["hostName"],
-                    "obs_quantity": len(self.jh.raw_json["observations"]),
-                    "score_date": datetime.date.fromisoformat(
+                    "crateName": self.jh.raw_json["crateName"],
+                    "fileQuantity": 1,
+                    "hostName": self.jh.raw_json["equipment"]["hostName"],
+                    "obsQuantity": len(self.jh.raw_json["observations"]),
+                    "scoreDate": datetime.date.fromisoformat(
                         self.jh.raw_json["timeStamp"]["iso8601"][:10]
                     ),
                 }
@@ -146,46 +159,19 @@ class Validator:
 
                 return True
             else:
-                logger.info(f"skippping already processed:{test_file_name}")
-                print("skipping already processed file")
+                logger.info("skippping already processed:%s", test_file_name)
                 return False
 
-        except Exception as error:
-            logger.error(f"postgres failure {test_file_name}: {error}")
+        except (KeyError, TypeError, ValueError, OSError) as error:
+            logger.error("postgres failure %s: %s", test_file_name, error)
 
         return False
 
     def file_processor(self, file_name1: str, file_name2: str) -> None:
-        logger.info(f"processing files: {file_name1}, {file_name2}")
-
-        if os.path.isfile(file_name1) is False:
-            logger.warning(f"skipping non-file:{file_name1}")
-            self.file_failure2(file_name1, file_name2)
-            return
-
-        if os.path.isfile(file_name2) is False:
-            logger.warning(f"skipping non-file:{file_name2}")
-            self.file_failure2(file_name1, file_name2)
-            return
-
-        if os.path.getsize(file_name1) < 1 or os.path.getsize(file_name2) < 1:
-            logger.warning(f"skipping empty file(s):{file_name1} {file_name2}")
-            self.file_failure2(file_name1, file_name2)
-            return
+        logger.info("processing files: %s, %s", file_name1, file_name2)
 
         test_file_name = file_name1 if file_name1.endswith(".json") else file_name2
-        if not self.jh.json_file_reader(test_file_name, False):
-            logger.warning(f"json file read/verify failure for {test_file_name}")
-            self.file_failure2(file_name1, file_name2)
-            return
-
-        if not self._file_name_matches(self.jh.raw_json["fileName"], test_file_name):
-            logger.warning(f"mismatched file name: {self.jh.raw_json['fileName']} vs {test_file_name}")
-            self.file_failure2(file_name1, file_name2)
-            return
-
-        if not self._is_supported_v2_payload():
-            logger.warning(f"invalid v2 payload for {test_file_name}")
+        if not self.jh.json_file_tester(test_file_name, "heeler-v2", 2):
             self.file_failure2(file_name1, file_name2)
             return
 
@@ -194,26 +180,30 @@ class Validator:
         else:
             self.file_failure2(file_name1, file_name2)
 
-    def execute(self) -> None:
-        logger.info(f"validator fresh dir:{self.fresh_dir}")
+    def execute(self) -> int:
+        logger.info("validator fresh dir:%s", self.fresh_dir)
 
         os.chdir(self.fresh_dir)
         targets = sorted(os.listdir("."))
-        logger.info(f"{len(targets)} files noted")
+        logger.info("%s files noted", len(targets))
 
-        ndx1 = 0
-        while ndx1 < len(targets) - 1:
-            # valid files will arrive in pairs
-            target1 = targets[ndx1]
-            target2 = targets[ndx1 + 1]
+        pairs, orphans = self._group_pairs(targets)
+        logger.info(
+            "%s pairs and %s invalid/orphan files noted", len(pairs), len(orphans)
+        )
 
-            temp = target1.split(".")
-            if target2.startswith(temp[0]):
-                self.file_processor(target1, target2)
+        for target1, target2 in pairs:
+            self.file_processor(target1, target2)
 
-            ndx1 += 1
+        for orphan in orphans:
+            self.file_failure(orphan)
 
-        logger.info(f"validator success:{self.success} failure:{self.failure}")
+        logger.info("validator success:%s failure:%s", self.success, self.failure)
+        return 0
+
+ValidatorEngine = HeelerValidator
+Validator = HeelerValidator
+
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***

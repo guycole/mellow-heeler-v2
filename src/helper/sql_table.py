@@ -15,6 +15,15 @@ from sqlalchemy.ext.declarative import declared_attr
 
 mapper_registry = registry()
 
+def _arg(args: dict[str, any], camel_key: str, snake_key: str | None = None):
+    if camel_key in args:
+        return args[camel_key]
+
+    if snake_key is not None and snake_key in args:
+        return args[snake_key]
+
+    raise KeyError(camel_key)
+
 class Base(DeclarativeBase):
     pass
 
@@ -43,11 +52,11 @@ class DailyScore(Base):
     score_date = Column(Date)
 
     def __init__(self, args: dict[str, any]):
-        self.crate_name = args["crate_name"]
-        self.file_quantity = args["file_quantity"]
-        self.host_name = args["host_name"]
-        self.obs_quantity = args["obs_quantity"]
-        self.score_date = args["score_date"]
+        self.crate_name = _arg(args, "crateName", "crate_name")
+        self.file_quantity = _arg(args, "fileQuantity", "file_quantity")
+        self.host_name = _arg(args, "hostName", "host_name")
+        self.obs_quantity = _arg(args, "obsQuantity", "obs_quantity")
+        self.score_date = _arg(args, "scoreDate", "score_date")
 
     def __repr__(self):
         return f"daily_score({self.score_date} {self.host_name})"
@@ -66,14 +75,14 @@ class GeoLoc(Base):
     speed = Column(Float)
    
     def __init__(self, args: dict[str, any]):
-        self.altitude = args["altitude"]
-        self.course = args["course"]
-        self.fix_time = args["fix_time"]
-        self.host_name = args["host_name"]
-        self.latitude = args["latitude"]
-        self.longitude = args["longitude"]
-        self.site_name = args["site_name"]
-        self.speed = args["speed"]
+        self.altitude = _arg(args, "altitude")
+        self.course = _arg(args, "course")
+        self.fix_time = _arg(args, "fixTime", "fix_time")
+        self.host_name = _arg(args, "hostName", "host_name")
+        self.latitude = _arg(args, "latitude")
+        self.longitude = _arg(args, "longitude")
+        self.site_name = _arg(args, "siteName", "site_name")
+        self.speed = _arg(args, "speed")
 
     def __repr__(self):
         return f"geo_loc({self.site_name} {self.host_name})"
@@ -95,17 +104,17 @@ class LoadLog(Base):
     task = Column(String)
 
     def __init__(self, args: dict[str, any]):
-        self.crate_name = args["crate_name"]
-        self.epoch_seconds = args["epoch_seconds"]
-        self.file_name = args["file_name"]
-        self.geo_loc_id = args["geo_loc_id"]
-        self.host_name = args["host_name"]
-        self.load_time = args.get("load_time", datetime.now())
-        self.mode = args["mode"]
-        self.obs_quantity = args["obs_quantity"]
-        self.obs_time = args["obs_time"]
-        self.site_name = args["site_name"]
-        self.task = args["task"]
+        self.crate_name = _arg(args, "crateName", "crate_name")
+        self.epoch_seconds = _arg(args, "epochSeconds", "epoch_seconds")
+        self.file_name = _arg(args, "fileName", "file_name")
+        self.geo_loc_id = _arg(args, "geoLocId", "geo_loc_id")
+        self.host_name = _arg(args, "hostName", "host_name")
+        self.load_time = args.get("loadTime", args.get("load_time", datetime.now()))
+        self.mode = _arg(args, "mode")
+        self.obs_quantity = _arg(args, "obsQuantity", "obs_quantity")
+        self.obs_time = _arg(args, "obsTime", "obs_time")
+        self.site_name = _arg(args, "siteName", "site_name")
+        self.task = _arg(args, "task")
 
     def __repr__(self):
         return f"load_log({self.file_name} {self.obs_time} {self.task} {self.host_name})"
@@ -123,11 +132,11 @@ class Observation(Base):
     wap_id = Column(BigInteger)
 
     def __init__(self, args: dict[str, any]):
-        self.bssid = args["bssid"]
-        self.load_log_id = args["load_log_id"]
-        self.obs_time = args["obs_time"]
-        self.signal_dbm = args["signal_dbm"]
-        self.wap_id = args["wap_id"]
+        self.bssid = _arg(args, "bssid")
+        self.load_log_id = _arg(args, "loadLogId", "load_log_id")
+        self.obs_time = _arg(args, "obsTime", "obs_time")
+        self.signal_dbm = _arg(args, "signalDbm", "signal_dbm")
+        self.wap_id = _arg(args, "wapId", "wap_id")
 
     def __repr__(self):
         return f"observation({self.wap_id} {self.load_log_id} {self.bssid})"
@@ -146,12 +155,12 @@ class Wap(Base):
     version = Column(Integer)
 
     def __init__(self, args: dict[str, any]):
-        self.bssid = args["bssid"]
-        self.capability = args["capability"]
-        self.cipher = args["cipher"]
-        self.frequency_mhz = args["frequency_mhz"]
-        self.ssid = args["ssid"]
-        self.version = args["version"]
+        self.bssid = _arg(args, "bssid")
+        self.capability = _arg(args, "capability")
+        self.cipher = _arg(args, "cipher")
+        self.frequency_mhz = _arg(args, "frequencyMhz", "frequency_mhz")
+        self.ssid = _arg(args, "ssid")
+        self.version = _arg(args, "version")
 
     def __repr__(self):
         return f"wap({self.bssid} {self.version} {self.ssid})"

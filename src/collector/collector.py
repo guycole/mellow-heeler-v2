@@ -7,73 +7,105 @@
 
 import datetime
 import logging
-import pydantic
 import sys
 import time
 import uuid
 import zoneinfo
+from abc import ABC, abstractmethod
 from typing import Any
 
-from parser import Parser
-
+import pydantic
 import yaml
+from parser import Parser
 from yaml.loader import SafeLoader
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("heeler")
 
+
 class Equipment(pydantic.BaseModel):
-    hostName: str
-    hostType: str
+    model_config = pydantic.ConfigDict(populate_by_name=True)
+
+    host_name: str = pydantic.Field(alias="hostName")
+    host_type: str = pydantic.Field(alias="hostType")
+
 
 class GeoLoc(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(populate_by_name=True)
+
     altitude: float
     latitude: float
     longitude: float
-    siteName: str
+    site_name: str = pydantic.Field(alias="siteName")
+
 
 class Job(pydantic.BaseModel):
     mode: str
     project: str
     task: str
 
+
 class Observation(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(populate_by_name=True)
+
     bssid: str
     capabilities: str
-    cipherType: str
-    frequencyMhz: int
-    signalDbm: int
+    cipher_type: str = pydantic.Field(alias="cipherType")
+    frequency_mhz: int = pydantic.Field(alias="frequencyMhz")
+    signal_dbm: int = pydantic.Field(alias="signalDbm")
     ssid: str
 
+
 class Receiver(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(populate_by_name=True)
+
     antenna: str
-    receiverId: int
+    receiver_id: int = pydantic.Field(alias="receiverId")
     task: str
     type: str
 
+
 class TimeStamp(pydantic.BaseModel):
-    epochSeconds: int = pydantic.Field(default_factory=lambda: int(time.time()))
+    model_config = pydantic.ConfigDict(populate_by_name=True)
+
+    epoch_seconds: int = pydantic.Field(
+        default_factory=lambda: int(time.time()), alias="epochSeconds"
+    )
     iso8601: str = ""
 
     @pydantic.model_validator(mode="after")
     def sync_iso8601_from_epoch(self) -> "TimeStamp":
         self.iso8601 = datetime.datetime.fromtimestamp(
-            self.epochSeconds, tz=zoneinfo.ZoneInfo("UTC")
+            self.epoch_seconds, tz=zoneinfo.ZoneInfo("UTC")
         ).isoformat()
         return self
 
+
 class HeelerModel(pydantic.BaseModel):
-    crateName: str
-    fileName: str
+    model_config = pydantic.ConfigDict(populate_by_name=True)
+
+    crate_name: str = pydantic.Field(alias="crateName")
+    file_name: str = pydantic.Field(alias="fileName")
     version: int = 2
     equipment: Equipment
-    geoLoc: GeoLoc
+    geo_loc: GeoLoc = pydantic.Field(alias="geoLoc")
     job: Job
     receiver: Receiver
-    timeStamp: TimeStamp
+    time_stamp: TimeStamp = pydantic.Field(alias="timeStamp")
     observations: list[Observation]
 
-class Collector:
+
+class Collector(ABC):
+    @abstractmethod
+    def get_observations(self, file_name: str) -> list[Observation]:
+        pass
+
+    @abstractmethod
+    def execute(self, file_name: str) -> int:
+        pass
+
+
+class HeelerCollector(Collector):
     def __init__(self, args: dict[str, Any]):
         self.crate_name = args["crateName"]
         self.fresh_dir = args["freshDir"]
@@ -91,46 +123,47 @@ class Collector:
         project = "-".join(tokens[:-1])
         self.job = Job(mode=mode, project=project, task=task)
 
-    # copy the original iwlist file to fresh directory
     def copy_raw_file(self, source_file: str, dest_file: str) -> None:
         try:
-            with open(source_file, "r") as in_file:
-                with open(dest_file, "w") as out_file:
+            with open(source_file, "r", encoding="utf-8") as in_file:
+                with open(dest_file, "w", encoding="utf-8") as out_file:
                     out_file.writelines(in_file.readlines())
-        except Exception as error:
-            logger.error(error)
+        except OSError as error:
+            logger.error("copy raw file failed: %s", error)
 
-    def execute(self, file_name: str) -> None:
-        logger.info(f"collector reading: {file_name}")
+    def get_observations(self, file_name: str) -> list[Observation]:
+        parser = Parser()
+        parsed = parser.execute(file_name)
+        return [Observation(**obs) for obs in parsed]
+
+    def execute(self, file_name: str) -> int:
+        logger.info("collector reading: %s", file_name)
 
         base_file_name = str(uuid.uuid4())
-        logger.info(f"base filename: {base_file_name}")
+        logger.info("base filename: %s", base_file_name)
 
         outfile_json = f"{self.fresh_dir}/{base_file_name}.json"
         outfile_raw = f"{self.fresh_dir}/{base_file_name}.raw"
 
         self.copy_raw_file(file_name, outfile_raw)
-
-        parser = Parser()
-        observations = parser.execute(file_name)
-
-        obs_list = []
-        for obs in observations:
-            obs_list.append(Observation(**obs))
+        observations = self.get_observations(file_name)
 
         heeler_model = HeelerModel(
-            crateName = self.crate_name,
-            fileName = outfile_json,
+            crate_name=self.crate_name,
+            file_name=f"{base_file_name}.json",
             equipment=self.equipment,
-            geoLoc=self.geo_loc,
+            geo_loc=self.geo_loc,
             job=self.job,
             receiver=self.receiver,
-            timeStamp=self.time_stamp,
-            observations=obs_list,
+            time_stamp=self.time_stamp,
+            observations=observations,
         )
 
         with open(outfile_json, "w", encoding="utf-8") as out_file:
-            out_file.write(heeler_model.model_dump_json(indent=4))
+            out_file.write(heeler_model.model_dump_json(indent=4, by_alias=True))
+
+        return 0
+
 
 #
 # argv[1] = configuration filename
@@ -141,13 +174,15 @@ if __name__ == "__main__":
     else:
         file_name = "config.yaml"
 
-    with open(file_name, "r") as in_file:
+    with open(file_name, "r", encoding="utf-8") as in_file:
         try:
             configuration = yaml.load(in_file, Loader=SafeLoader)
-            collector = Collector(configuration)
-            collector.execute(configuration["scanFile"])
+            collector = HeelerCollector(configuration)
+            exit(collector.execute(configuration["scanFile"]))
         except yaml.YAMLError as error:
-            print(error)
+            logger.error("YAML parse error: %s", error)
+
+    exit(1)
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***
