@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -8,12 +7,6 @@ import pytest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SRC_DIR = REPO_ROOT / "src"
-WOMBAT_DIR = SRC_DIR / "wombat_docker"
-
-# validator.py imports helper as top-level package.
-sys.path.insert(0, str(SRC_DIR))
-sys.path.insert(0, str(WOMBAT_DIR))
 
 import validator as validator_module
 
@@ -90,7 +83,7 @@ def test_file_processor_valid_pair_writes_postgres_and_moves_to_success(
     monkeypatch.setenv("FAILURE_DIR", str(failure_dir))
 
     fake_postgres = FakePostGres(already_processed=False, geo_loc_id=123)
-    validator = validator_module.Validator(fake_postgres)
+    validator = validator_module.HeelerValidator(fake_postgres)
 
     previous_dir = os.getcwd()
     os.chdir(tmp_path)
@@ -112,13 +105,15 @@ def test_file_processor_valid_pair_writes_postgres_and_moves_to_success(
     assert len(fake_postgres.daily_score_payloads) == 1
 
     load_log = fake_postgres.load_log_insert_payloads[0]
-    assert load_log["crate_name"] == payload["crateName"]
-    assert load_log["host_name"] == payload["equipment"]["hostName"]
-    assert load_log["obs_quantity"] == len(payload["observations"])
-    assert load_log["geo_loc_id"] == 123
+    assert load_log["crateName"] == payload["crateName"]
+    assert load_log["hostName"] == payload["equipment"]["hostName"]
+    assert load_log["obsQuantity"] == len(payload["observations"])
+    assert load_log["geoLocId"] == 123
 
 
-def test_file_processor_mismatched_json_filename_moves_to_failure(tmp_path, monkeypatch):
+def test_file_processor_mismatched_json_filename_moves_to_failure(
+    tmp_path, monkeypatch
+):
     payload = _load_sample_json("09ee27f4-0b2b-4d26-a180-03860c80c282.json")
     json_name, raw_name = _write_test_pair(tmp_path, payload, "scan-mismatch")
     fresh_dir, success_dir, failure_dir = _make_dirs(tmp_path)
@@ -133,7 +128,7 @@ def test_file_processor_mismatched_json_filename_moves_to_failure(tmp_path, monk
     monkeypatch.setenv("FAILURE_DIR", str(failure_dir))
 
     fake_postgres = FakePostGres(already_processed=False)
-    validator = validator_module.Validator(fake_postgres)
+    validator = validator_module.HeelerValidator(fake_postgres)
 
     previous_dir = os.getcwd()
     os.chdir(tmp_path)
@@ -150,7 +145,9 @@ def test_file_processor_mismatched_json_filename_moves_to_failure(tmp_path, monk
     assert len(fake_postgres.daily_score_payloads) == 0
 
 
-def test_file_processor_duplicate_file_moves_to_failure_without_new_inserts(tmp_path, monkeypatch):
+def test_file_processor_duplicate_file_moves_to_failure_without_new_inserts(
+    tmp_path, monkeypatch
+):
     payload = _load_sample_json("09ee27f4-0b2b-4d26-a180-03860c80c282.json")
     json_name, raw_name = _write_test_pair(tmp_path, payload, "scan-duplicate")
     fresh_dir, success_dir, failure_dir = _make_dirs(tmp_path)
@@ -160,7 +157,7 @@ def test_file_processor_duplicate_file_moves_to_failure_without_new_inserts(tmp_
     monkeypatch.setenv("FAILURE_DIR", str(failure_dir))
 
     fake_postgres = FakePostGres(already_processed=True)
-    validator = validator_module.Validator(fake_postgres)
+    validator = validator_module.HeelerValidator(fake_postgres)
 
     previous_dir = os.getcwd()
     os.chdir(tmp_path)
@@ -187,7 +184,7 @@ def test_file_processor_rejects_v1_payload(tmp_path, monkeypatch):
     monkeypatch.setenv("FAILURE_DIR", str(failure_dir))
 
     fake_postgres = FakePostGres(already_processed=False)
-    validator = validator_module.Validator(fake_postgres)
+    validator = validator_module.HeelerValidator(fake_postgres)
 
     previous_dir = os.getcwd()
     os.chdir(tmp_path)

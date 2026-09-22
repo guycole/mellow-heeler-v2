@@ -15,7 +15,7 @@ sys.path.insert(0, str(COLLECTOR_DIR))
 import collector as collector_module
 
 
-def make_configuration(tmp_path: Path) -> dict:
+def make_configuration(tmp_path: Path) -> dict[str, object]:
     return {
         "crateName": "wombat04",
         "freshDir": str(tmp_path),
@@ -39,32 +39,30 @@ def make_configuration(tmp_path: Path) -> dict:
     }
 
 
-def test_init_maps_config_fields(tmp_path, monkeypatch):
+def test_init_maps_config_fields(tmp_path):
     cfg = make_configuration(tmp_path)
-    monkeypatch.setattr(collector_module, "configuration", cfg, raising=False)
 
-    collector = collector_module.Collector(cfg)
+    collector = collector_module.HeelerCollector(cfg)
 
     assert collector.crate_name == "wombat04"
     assert collector.fresh_dir == str(tmp_path)
     assert collector.gps_enable is False
-    assert collector.equipment.hostName == "pi3b"
-    assert collector.equipment.hostType == "rpi3"
+    assert collector.equipment.host_name == "pi3b"
+    assert collector.equipment.host_type == "rpi3"
     assert collector.geo_loc.altitude == 0
     assert collector.geo_loc.latitude == 38.108
     assert collector.geo_loc.longitude == -122.268
-    assert collector.geo_loc.siteName == "vallejo01"
+    assert collector.geo_loc.site_name == "vallejo01"
     assert collector.receiver.antenna == "whip"
-    assert collector.receiver.receiverId == 2
+    assert collector.receiver.receiver_id == 2
     assert collector.receiver.task == "heeler-v2-iwlist"
     assert collector.receiver.type == "ac-1300"
 
 
-def test_copy_raw_file_copies_contents(tmp_path, monkeypatch):
+def test_copy_raw_file_copies_contents(tmp_path):
     cfg = make_configuration(tmp_path)
-    monkeypatch.setattr(collector_module, "configuration", cfg, raising=False)
 
-    collector = collector_module.Collector(cfg)
+    collector = collector_module.HeelerCollector(cfg)
     source = tmp_path / "source.raw"
     dest = tmp_path / "dest.raw"
 
@@ -77,10 +75,9 @@ def test_copy_raw_file_copies_contents(tmp_path, monkeypatch):
 
 def test_execute_creates_json_and_raw_with_expected_payload(tmp_path, monkeypatch):
     cfg = make_configuration(tmp_path)
-    monkeypatch.setattr(collector_module, "configuration", cfg, raising=False)
     monkeypatch.setattr(collector_module.time, "time", lambda: 1784402415)
 
-    collector = collector_module.Collector(cfg)
+    collector = collector_module.HeelerCollector(cfg)
 
     scan_file = tmp_path / "scan.txt"
     scan_file.write_text("dummy scan content\n", encoding="utf-8")
@@ -105,7 +102,9 @@ def test_execute_creates_json_and_raw_with_expected_payload(tmp_path, monkeypatc
 
     monkeypatch.setattr(collector_module, "Parser", FakeParser)
 
-    collector.execute(str(scan_file))
+    result = collector.execute(str(scan_file))
+
+    assert result == 0
 
     raw_file = tmp_path / "11111111-2222-3333-4444-555555555555.raw"
     json_file = tmp_path / "11111111-2222-3333-4444-555555555555.json"
@@ -117,7 +116,7 @@ def test_execute_creates_json_and_raw_with_expected_payload(tmp_path, monkeypatc
     payload = json.loads(json_file.read_text(encoding="utf-8"))
 
     assert payload["crateName"] == "wombat04"
-    assert payload["fileName"] == str(json_file)
+    assert payload["fileName"] == "11111111-2222-3333-4444-555555555555.json"
     assert payload["version"] == 2
     assert payload["timeStamp"]["epochSeconds"] == 1784402415
     assert payload["timeStamp"]["iso8601"] == "2026-07-18T19:20:15+00:00"

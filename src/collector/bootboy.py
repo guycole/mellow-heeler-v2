@@ -9,10 +9,7 @@ import json
 import socket
 import sys
 
-from parser import Parser
-
 import yaml
-from yaml.loader import SafeLoader
 
 
 class BootBoy:
@@ -85,7 +82,7 @@ class BootBoy:
             print(f"Error updating wombat's crontab: {e}")
 
     def execute(self, target: str) -> None:
-        task = self.configuration(target)
+        self.configuration(target)
         self.crontab()
 
 
