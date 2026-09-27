@@ -117,6 +117,7 @@ def test_execute_creates_json_and_raw_with_expected_payload(tmp_path, monkeypatc
 
     assert payload["crateName"] == "wombat04"
     assert payload["fileName"] == "11111111-2222-3333-4444-555555555555.json"
+    assert payload["sourceFileName"] == "scan.txt"
     assert payload["version"] == 2
     assert payload["timeStamp"]["epochSeconds"] == 1784402415
     assert payload["timeStamp"]["iso8601"] == "2026-07-18T19:20:15+00:00"
@@ -140,6 +141,7 @@ def test_sample_json_shape_reference_matches_expected_keys():
         "timeStamp",
         "crateName",
         "fileName",
+        "sourceFileName",
         "version",
         "observations",
     }

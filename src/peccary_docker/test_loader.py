@@ -100,6 +100,7 @@ def _load_sample_json() -> dict:
 def _write_json(tmp_path: Path, payload: dict, file_name: str) -> Path:
     temp = dict(payload)
     temp["fileName"] = file_name
+    temp["sourceFileName"] = file_name.replace(".json", ".raw")
     target = tmp_path / file_name
     target.write_text(json.dumps(temp), encoding="utf-8")
     return target

@@ -15,5 +15,6 @@ pytest==9.1.1
 pytokens==0.4.1
 referencing==0.37.0
 rpds-py==2026.6.3
+ruff==0.16.9
 SQLAlchemy==2.0.51
 typing_extensions==4.16.0

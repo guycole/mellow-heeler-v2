@@ -7,6 +7,7 @@
 
 import datetime
 import logging
+import os
 import sys
 import time
 import uuid
@@ -86,6 +87,7 @@ class HeelerModel(pydantic.BaseModel):
 
     crate_name: str = pydantic.Field(alias="crateName")
     file_name: str = pydantic.Field(alias="fileName")
+    source_file_name: str = pydantic.Field(alias="sourceFileName")
     version: int = 2
     equipment: Equipment
     geo_loc: GeoLoc = pydantic.Field(alias="geoLoc")
@@ -151,6 +153,7 @@ class HeelerCollector(Collector):
         heeler_model = HeelerModel(
             crate_name=self.crate_name,
             file_name=f"{base_file_name}.json",
+            source_file_name=os.path.basename(file_name),
             equipment=self.equipment,
             geo_loc=self.geo_loc,
             job=self.job,

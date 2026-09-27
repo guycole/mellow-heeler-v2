@@ -49,6 +49,7 @@ def _write_test_pair(tmp_path: Path, payload: dict, base_name: str):
 
     payload = dict(payload)
     payload["fileName"] = json_name
+    payload["sourceFileName"] = raw_name
 
     (tmp_path / json_name).write_text(json.dumps(payload), encoding="utf-8")
     (tmp_path / raw_name).write_text("raw data\n", encoding="utf-8")
