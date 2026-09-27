@@ -1,6 +1,7 @@
 {
     "crateName": "wombat04",
-    "fileName": "/var/wombat/fresh/heeler/09ee27f4-0b2b-4d26-a180-03860c80c282.json",
+    "fileName": "09ee27f4-0b2b-4d26-a180-03860c80c282.json",
+    "sourceFileName": "09ee27f4-0b2b-4d26-a180-03860c80c282.raw",
     "version": 2,
     "equipment": {
         "hostName": "pi3b",

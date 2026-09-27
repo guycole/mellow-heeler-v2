@@ -32,7 +32,7 @@ Mellow Heeler collectors use [Raspberry Pi 3](https://www.raspberrypi.org/) augm
 ```
 {
     "crateName": "wombat04",
-    "fileName": "/var/wombat/fresh/heeler/09ee27f4-0b2b-4d26-a180-03860c80c282.json",
+    "fileName": "09ee27f4-0b2b-4d26-a180-03860c80c282.json",
     "version": 2,
     "equipment": {
         "hostName": "pi3b",

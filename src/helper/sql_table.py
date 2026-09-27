@@ -5,17 +5,15 @@
 # Author: G.S. Cole (guycole at gmail dot com)
 #
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import Column
-from sqlalchemy import BigInteger, Boolean, Date, DateTime, Float, Integer, SmallInteger, String
+from sqlalchemy import BigInteger, Date, DateTime, Float, Integer, SmallInteger, String
 
-from sqlalchemy.orm import registry
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.ext.declarative import declared_attr
 
-mapper_registry = registry()
 
-def _arg(args: dict[str, any], camel_key: str, snake_key: str | None = None):
+def _arg(args: dict[str, Any], camel_key: str, snake_key: str | None = None):
     if camel_key in args:
         return args[camel_key]
 
@@ -24,8 +22,10 @@ def _arg(args: dict[str, any], camel_key: str, snake_key: str | None = None):
 
     raise KeyError(camel_key)
 
+
 class Base(DeclarativeBase):
     pass
+
 
 class BssidScore(Base):
     __tablename__ = "heeler_bssid_score"
@@ -34,7 +34,7 @@ class BssidScore(Base):
     bssid = Column(String)
     quantity = Column(Integer)
 
-    def __init__(self, args: dict[str, any]):
+    def __init__(self, args: dict[str, Any]):
         self.bssid = args["bssid"]
         self.quantity = args["quantity"]
 
@@ -51,7 +51,7 @@ class DailyScore(Base):
     obs_quantity = Column(Integer)
     score_date = Column(Date)
 
-    def __init__(self, args: dict[str, any]):
+    def __init__(self, args: dict[str, Any]):
         self.crate_name = _arg(args, "crateName", "crate_name")
         self.file_quantity = _arg(args, "fileQuantity", "file_quantity")
         self.host_name = _arg(args, "hostName", "host_name")
@@ -73,8 +73,8 @@ class GeoLoc(Base):
     longitude = Column(Float)
     site_name = Column(String)
     speed = Column(Float)
-   
-    def __init__(self, args: dict[str, any]):
+
+    def __init__(self, args: dict[str, Any]):
         self.altitude = _arg(args, "altitude")
         self.course = _arg(args, "course")
         self.fix_time = _arg(args, "fixTime", "fix_time")
@@ -101,9 +101,10 @@ class LoadLog(Base):
     obs_quantity = Column(SmallInteger)
     obs_time = Column(DateTime)
     site_name = Column(String)
+    source_file_name = Column(String)
     task = Column(String)
 
-    def __init__(self, args: dict[str, any]):
+    def __init__(self, args: dict[str, Any]):
         self.crate_name = _arg(args, "crateName", "crate_name")
         self.epoch_seconds = _arg(args, "epochSeconds", "epoch_seconds")
         self.file_name = _arg(args, "fileName", "file_name")
@@ -114,6 +115,9 @@ class LoadLog(Base):
         self.obs_quantity = _arg(args, "obsQuantity", "obs_quantity")
         self.obs_time = _arg(args, "obsTime", "obs_time")
         self.site_name = _arg(args, "siteName", "site_name")
+        self.source_file_name = _arg(
+            args, "sourceFileName", "source_file_name"
+        )
         self.task = _arg(args, "task")
 
     def __repr__(self):
@@ -131,7 +135,7 @@ class Observation(Base):
     signal_dbm = Column(SmallInteger)
     wap_id = Column(BigInteger)
 
-    def __init__(self, args: dict[str, any]):
+    def __init__(self, args: dict[str, Any]):
         self.bssid = _arg(args, "bssid")
         self.load_log_id = _arg(args, "loadLogId", "load_log_id")
         self.obs_time = _arg(args, "obsTime", "obs_time")
@@ -154,7 +158,7 @@ class Wap(Base):
     ssid = Column(String)
     version = Column(Integer)
 
-    def __init__(self, args: dict[str, any]):
+    def __init__(self, args: dict[str, Any]):
         self.bssid = _arg(args, "bssid")
         self.capability = _arg(args, "capability")
         self.cipher = _arg(args, "cipher")

@@ -41,7 +41,9 @@ class HeelerApp:
                 "options": f"-c statement_timeout={statement_timeout_ms}",
             },
         )
-        self.postgres = PostGres(sessionmaker(bind=db_engine, expire_on_commit=False))
+        self.postgres = PostGres(
+            sessionmaker(bind=db_engine, expire_on_commit=False), logger
+        )
 
     def execute(self) -> int:
         logger.info("heeler execute: %s", self.stunt_box)
@@ -50,12 +52,13 @@ class HeelerApp:
             koala = Koala()
             koala.execute()
             return 0
-        elif self.stunt_box == "validator":
+
+        if self.stunt_box == "validator":
             validator = HeelerValidator(self.postgres)
             return validator.execute()
-        else:
-            logger.error("invalid stunt_box option: %s", self.stunt_box)
-            return 1
+
+        logger.error("invalid stunt_box option: %s", self.stunt_box)
+        return 1
 
 
 if __name__ == "__main__":

@@ -6,14 +6,13 @@
 #
 import logging
 import os
-import sys
 
 from helper.postgres import PostGres
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from loader import Loader
+from loader import HeelerLoader
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("heeler")
@@ -26,28 +25,40 @@ class HeelerApp:
 
         self.db_conn = os.environ.get(
             "DB_CONN",
-            "postgresql+psycopg2://heeler_client:batabat@host.docker.internal:5432/heeler"
+            "postgresql+psycopg2://heeler_client:batabat@localhost:5432/heeler",
         )
 
-        db_engine = create_engine(self.db_conn, echo=False)
-        self.postgres = PostGres(sessionmaker(bind=db_engine, expire_on_commit=False))
+        connect_timeout = int(os.environ.get("PG_CONNECT_TIMEOUT", "5"))
+        statement_timeout_ms = int(os.environ.get("PG_STATEMENT_TIMEOUT_MS", "5000"))
 
-    def execute(self) -> None:
-        logger.info(f"heeler execute:{self.stunt_box}")
+        db_engine = create_engine(
+            self.db_conn,
+            echo=False,
+            pool_pre_ping=True,
+            connect_args={
+                "connect_timeout": connect_timeout,
+                "options": f"-c statement_timeout={statement_timeout_ms}",
+            },
+        )
+        self.postgres = PostGres(
+            sessionmaker(bind=db_engine, expire_on_commit=False), logger
+        )
+
+    def execute(self) -> int:
+        logger.info("heeler execute:%s", self.stunt_box)
 
         if self.stunt_box == "loader":
-            loader = Loader(self.postgres)
-            loader.execute()
+            loader = HeelerLoader(logger, self.postgres)
+            return loader.execute()
         else:
-            logger.error(f"invalid stunt_box option:{self.stunt_box}")
-            return
+            logger.error("invalid stunt_box option:%s", self.stunt_box)
+            return 1
 
 
 if __name__ == "__main__":
     stunt_box = os.environ.get("stuntbox", "loader")
-
     app = HeelerApp(stunt_box)
-    app.execute()
+    exit(app.execute())
 
 # ;;; Local Variables: ***
 # ;;; mode:python ***

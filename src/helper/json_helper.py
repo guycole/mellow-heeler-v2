@@ -8,6 +8,7 @@
 import json
 import logging
 import os
+from typing import Any
 
 from jsonschema import validate
 
@@ -69,6 +70,7 @@ schema = {
         },
         "crateName":    {"type": "string"},
         "fileName":     {"type": "string"},
+        "sourceFileName": {"type": "string"},
         "version":      {"type": "integer"},
         "observations": {
             "type": "array",
@@ -87,13 +89,13 @@ schema = {
             }
         },
     },
-    "required": ["equipment", "geoLoc", "job", "receiver", "timeStamp", "crateName", "fileName", "version", "observations"],
+    "required": ["equipment", "geoLoc", "job", "receiver", "timeStamp", "crateName", "fileName", "sourceFileName", "version", "observations"],
     "additionalProperties": False
 }
 
 class JsonHelper:
-
-    def __init__(self):
+    def __init__(self, logger_instance: logging.Logger | None = None):
+        self.logger = logger_instance or logger
         self.raw_json = None
 
     def json_file_reader(self, file_name: str, validate_flag: bool) -> bool:
@@ -101,30 +103,30 @@ class JsonHelper:
             with open(file_name, "r", encoding="utf-8") as in_file:
                 self.raw_json = json.load(in_file)
         except Exception as error:
-            logger.error(f"file read failed for {file_name}: {error}")
+            self.logger.error(f"file read failed for {file_name}: {error}")
             return False
 
         if validate_flag:
             try:
                 validate(instance=self.raw_json, schema=schema)
             except Exception as error:
-                logger.error(f"json validation failed for {file_name}: {error}")
+                self.logger.error(f"json validation failed for {file_name}: {error}")
                 return False
 
         return True
 
-    def json_file_writer(self, file_name: str, json_data: dict[str, any]) -> bool:
+    def json_file_writer(self, file_name: str, json_data: dict[str, Any]) -> bool:
         try:
             validate(instance=json_data, schema=schema)
         except Exception as error:
-            logger.error(f"json validation failed for {file_name}: {error.message}")
+            self.logger.error(f"json validation failed for {file_name}: {error}")
             return False
 
         try:
-            with open(file_name, "w") as out_file:
+            with open(file_name, "w", encoding="utf-8") as out_file:
                 json.dump(json_data, out_file, indent=4)
         except Exception as error:
-            logger.error(f"file write failure for {file_name}: {error}")
+            self.logger.error(f"file write failure for {file_name}: {error}")
             return False
 
         return True
@@ -137,32 +139,34 @@ class JsonHelper:
 
     def json_file_tester(self, file_name: str, project: str, version: int) -> bool:
         if not os.path.isfile(file_name):
-            logger.warning(f"skipping non-file:{file_name}")
+            self.logger.warning(f"skipping non-file:{file_name}")
             return False
 
         if os.path.getsize(file_name) < 1:
-            logger.warning(f"skipping empty file:{file_name}")
+            self.logger.warning(f"skipping empty file:{file_name}")
             return False
 
         if not file_name.endswith(".json"):
-            logger.warning(f"skipping non-json:{file_name}")
+            self.logger.warning(f"skipping non-json:{file_name}")
             return False
 
         if not self.json_file_reader(file_name, True):
-            logger.warning(f"json file read/verify failure for {file_name}")
+            self.logger.warning(f"json file read/verify failure for {file_name}")
             return False
 
         if not self._file_name_matches(self.raw_json.get("fileName", ""), file_name):
-            logger.warning(f"mismatched file name: {self.raw_json.get('fileName', 'missing')} vs {file_name}")
+            self.logger.warning(
+                f"mismatched file name: {self.raw_json.get('fileName', 'missing')} vs {file_name}"
+            )
             return False
 
         if self.raw_json.get("version") != version:
-            logger.warning(f"invalid version for {file_name}")
+            self.logger.warning(f"invalid version for {file_name}")
             return False
 
         payload_project = self.raw_json.get("job", {}).get("project")
         if payload_project != project:
-            logger.warning(f"invalid project for {file_name}: {payload_project}")
+            self.logger.warning(f"invalid project for {file_name}: {payload_project}")
             return False
 
         return True

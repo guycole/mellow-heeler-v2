@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 logger = logging.getLogger("validator")
 
 
-class ValidatorBase(ABC):
+class Validator(ABC):
     @abstractmethod
     def file_failure(self, file_name: str) -> None:
         pass
@@ -43,10 +43,19 @@ class ValidatorBase(ABC):
         pass
 
 
-class HeelerValidator(ValidatorBase):
+class HeelerValidator(Validator):
 
-    def __init__(self, postgres: PostGres):
-        self.postgres = postgres
+    def __init__(
+        self,
+        logger_or_postgres: logging.Logger | PostGres,
+        postgres: PostGres | None = None,
+    ):
+        if postgres is None:
+            self.logger = logger
+            self.postgres = logger_or_postgres
+        else:
+            self.logger = logger_or_postgres
+            self.postgres = postgres
 
         self.failure_dir = os.environ.get("FAILURE_DIR", "/var/wombat/failure")
         self.fresh_dir = os.environ.get("FRESH_DIR", "/var/wombat/fresh/heeler")
@@ -55,7 +64,7 @@ class HeelerValidator(ValidatorBase):
         self.failure = 0
         self.success = 0
 
-        self.jh = JsonHelper()
+        self.json_helper = JsonHelper(self.logger)
 
     def _group_pairs(
         self, targets: list[str]
@@ -76,19 +85,22 @@ class HeelerValidator(ValidatorBase):
             if len(json_files) == 1 and len(non_json_files) == 1:
                 pairs.append((json_files[0], non_json_files[0]))
             else:
-                logger.warning("invalid file pair for stem:%s files:%s", stem, members)
+                self.logger.warning("invalid file pair for stem:%s files:%s", stem, members)
                 orphans.extend(members)
 
         return pairs, sorted(orphans)
 
     def file_failure(self, file_name: str) -> None:
-        logger.info("file failure:%s", file_name)
+        self.logger.info("file failure:%s", file_name)
 
         self.failure += 1
+        failure_target = os.path.join(self.failure_dir, file_name)
         try:
-            os.rename(file_name, os.path.join(self.failure_dir, file_name))
+            os.rename(file_name, failure_target)
         except OSError as error:
-            logger.error("file move failure for %s: %s", file_name, error)
+            self.logger.error(
+                "file move failure for %s -> %s: %s", file_name, failure_target, error
+            )
 
     def file_failure2(self, file_name1: str, file_name2: str) -> None:
         self.file_failure(file_name1)
@@ -96,11 +108,13 @@ class HeelerValidator(ValidatorBase):
 
     def file_success2(self, file_name1: str, file_name2: str) -> None:
         self.success += 1
+        success_target1 = os.path.join(self.success_dir, file_name1)
+        success_target2 = os.path.join(self.success_dir, file_name2)
         try:
-            os.rename(file_name1, os.path.join(self.success_dir, file_name1))
-            os.rename(file_name2, os.path.join(self.success_dir, file_name2))
+            os.rename(file_name1, success_target1)
+            os.rename(file_name2, success_target2)
         except OSError as error:
-            logger.error(
+            self.logger.error(
                 "file move success-target failure for %s/%s: %s",
                 file_name1,
                 file_name2,
@@ -108,70 +122,71 @@ class HeelerValidator(ValidatorBase):
             )
 
     def load_log_test(self, test_file_name: str) -> bool:
-        logger.info("load_log_test for file: %s", test_file_name)
+        self.logger.info("load_log_test for file: %s", test_file_name)
 
         try:
             candidate = self.postgres.load_log_select_by_file_name(test_file_name)
             if candidate is None:
-                logger.info("processing new file:%s", test_file_name)
+                self.logger.info("processing new file:%s", test_file_name)
 
                 geo_loc = self.postgres.geo_loc_select_by_site(
-                    self.jh.raw_json["geoLoc"]["siteName"]
+                    self.json_helper.raw_json["geoLoc"]["siteName"]
                 )
                 if len(geo_loc) == 0:
-                    logger.error(
+                    self.logger.error(
                         "must insert geo_loc for site: %s",
-                        self.jh.raw_json["geoLoc"]["siteName"],
+                        self.json_helper.raw_json["geoLoc"]["siteName"],
                     )
                     return False
 
                 load_log = {
-                    "crateName": self.jh.raw_json["crateName"],
-                    "epochSeconds": self.jh.raw_json["timeStamp"]["epochSeconds"],
+                    "crateName": self.json_helper.raw_json["crateName"],
+                    "epochSeconds": self.json_helper.raw_json["timeStamp"]["epochSeconds"],
                     "fileName": test_file_name,
                     "geoLocId": geo_loc[0].id,
-                    "hostName": self.jh.raw_json["equipment"]["hostName"],
+                    "hostName": self.json_helper.raw_json["equipment"]["hostName"],
                     "loadTime": datetime.datetime.now(),
-                    "mode": self.jh.raw_json["job"]["mode"],
-                    "obsQuantity": len(self.jh.raw_json["observations"]),
-                    "obsTime": self.jh.raw_json["timeStamp"]["iso8601"],
-                    "siteName": self.jh.raw_json["geoLoc"]["siteName"],
-                    "task": self.jh.raw_json["job"]["task"],
+                    "mode": self.json_helper.raw_json["job"]["mode"],
+                    "obsQuantity": len(self.json_helper.raw_json["observations"]),
+                    "obsTime": self.json_helper.raw_json["timeStamp"]["iso8601"],
+                    "siteName": self.json_helper.raw_json["geoLoc"]["siteName"],
+                    "sourceFileName": self.json_helper.raw_json["sourceFileName"],
+                    "task": self.json_helper.raw_json["job"]["task"],
                 }
 
                 self.postgres.load_log_insert(load_log)
 
                 daily_score = {
-                    "crateName": self.jh.raw_json["crateName"],
+                    "crateName": self.json_helper.raw_json["crateName"],
                     "fileQuantity": 1,
-                    "hostName": self.jh.raw_json["equipment"]["hostName"],
-                    "obsQuantity": len(self.jh.raw_json["observations"]),
+                    "hostName": self.json_helper.raw_json["equipment"]["hostName"],
+                    "obsQuantity": len(self.json_helper.raw_json["observations"]),
                     "scoreDate": datetime.date.fromisoformat(
-                        self.jh.raw_json["timeStamp"]["iso8601"][:10]
+                        self.json_helper.raw_json["timeStamp"]["iso8601"][:10]
                     ),
                 }
 
                 self.postgres.daily_score_insert_or_update(daily_score)
 
-                if len(self.jh.raw_json["observations"]) < 1:
-                    logger.info("skipping file with no observations")
+                if len(self.json_helper.raw_json["observations"]) < 1:
+                    self.logger.info("skipping file with no observations")
                     return False
 
                 return True
             else:
-                logger.info("skippping already processed:%s", test_file_name)
+                self.logger.info("skippping already processed:%s", test_file_name)
                 return False
 
         except (KeyError, TypeError, ValueError, OSError) as error:
-            logger.error("postgres failure %s: %s", test_file_name, error)
+            self.logger.error("postgres failure %s: %s", test_file_name, error)
 
         return False
 
     def file_processor(self, file_name1: str, file_name2: str) -> None:
-        logger.info("processing files: %s, %s", file_name1, file_name2)
+        self.logger.info("processing files: %s, %s", file_name1, file_name2)
 
         test_file_name = file_name1 if file_name1.endswith(".json") else file_name2
-        if not self.jh.json_file_tester(test_file_name, "heeler-v2", 2):
+        if not self.json_helper.json_file_tester(test_file_name, "heeler-v2", 2):
             self.file_failure2(file_name1, file_name2)
             return
 
@@ -181,14 +196,14 @@ class HeelerValidator(ValidatorBase):
             self.file_failure2(file_name1, file_name2)
 
     def execute(self) -> int:
-        logger.info("validator fresh dir:%s", self.fresh_dir)
+        self.logger.info("validator fresh dir:%s", self.fresh_dir)
 
         os.chdir(self.fresh_dir)
         targets = sorted(os.listdir("."))
-        logger.info("%s files noted", len(targets))
+        self.logger.info("%s files noted", len(targets))
 
         pairs, orphans = self._group_pairs(targets)
-        logger.info(
+        self.logger.info(
             "%s pairs and %s invalid/orphan files noted", len(pairs), len(orphans)
         )
 
@@ -198,8 +213,9 @@ class HeelerValidator(ValidatorBase):
         for orphan in orphans:
             self.file_failure(orphan)
 
-        logger.info("validator success:%s failure:%s", self.success, self.failure)
+        self.logger.info("validator success:%s failure:%s", self.success, self.failure)
         return 0
+
 
 ValidatorEngine = HeelerValidator
 Validator = HeelerValidator

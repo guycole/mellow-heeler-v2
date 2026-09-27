@@ -9,15 +9,14 @@
 # from sqlalchemy import select
 
 import datetime
-import time
-
-from typing import List, Dict
+import logging
+from typing import Any
 
 import sqlalchemy
 from sqlalchemy import and_
+from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy import desc
 
 from .sql_table import (
     BssidScore,
@@ -25,17 +24,23 @@ from .sql_table import (
     GeoLoc,
     LoadLog,
     Observation,
-    Wap
+    Wap,
 )
 
+
+logger = logging.getLogger("postgres")
+
+
 class PostGres:
-    db_engine = None
-    Session = None
-
-    def __init__(self, session: sqlalchemy.orm.session.sessionmaker):
+    def __init__(
+        self,
+        session: sqlalchemy.orm.session.sessionmaker,
+        logger_instance: logging.Logger | None = None,
+    ):
         self.Session = session
+        self.logger = logger_instance or logger
 
-    def bssid_score_insert_or_update(self, args: dict[str, any]) -> BssidScore:
+    def bssid_score_insert_or_update(self, args: dict[str, Any]) -> BssidScore:
         candidate = BssidScore(args)
 
         try:
@@ -53,11 +58,11 @@ class PostGres:
 
                 session.commit()
         except Exception as error:
-            print(error)
+            self.logger.error("bssid score update failed: %s", error)
 
         return candidate
 
-    def daily_score_insert_or_update(self, args: dict[str, any]) -> DailyScore:
+    def daily_score_insert_or_update(self, args: dict[str, Any]) -> DailyScore:
         candidate = DailyScore(args)
 
         try:
@@ -79,17 +84,17 @@ class PostGres:
 
                 session.commit()
         except Exception as error:
-            print(error)
+            self.logger.error("daily score update failed: %s", error)
 
         return candidate
 
-    def geo_loc_select_by_site(self, site_name: str) -> List[GeoLoc]:
+    def geo_loc_select_by_site(self, site_name: str) -> list[GeoLoc]:
         statement = select(GeoLoc).filter_by(site_name=site_name).order_by(GeoLoc.fix_time)
 
         with self.Session() as session:
             return session.scalars(statement).all()
 
-    def load_log_insert(self, args: dict[str, any]) -> LoadLog:
+    def load_log_insert(self, args: dict[str, Any]) -> LoadLog:
         candidate = LoadLog(args)
 
         try:
@@ -97,7 +102,7 @@ class PostGres:
                 session.add(candidate)
                 session.commit()
         except Exception as error:
-            print(error)
+            self.logger.error("load log insert failed: %s", error)
 
         return candidate
 
@@ -121,7 +126,7 @@ class PostGres:
                 select(LoadLog).filter_by(file_name=file_name)
             ).first()
 
-    def observation_insert(self, args: dict[str, any]) -> Observation:
+    def observation_insert(self, args: dict[str, Any]) -> Observation:
         candidate = Observation(args)
 
         try:
@@ -129,11 +134,11 @@ class PostGres:
                 session.add(candidate)
                 session.commit()
         except Exception as error:
-            print(error)
+            self.logger.error("observation insert failed: %s", error)
 
         return candidate
 
-    def wap_insert(self, args: dict[str, any]) -> Wap:
+    def wap_insert(self, args: dict[str, Any]) -> Wap:
         candidate = Wap(args)
 
         try:
@@ -141,11 +146,11 @@ class PostGres:
                 session.add(candidate)
                 session.commit()
         except Exception as error:
-            print(error)
+            self.logger.error("wap insert failed: %s", error)
 
         return candidate
 
-    def wap_select(self, wap: dict[str, any]) -> list[Wap]:
+    def wap_select(self, wap: dict[str, Any]) -> list[Wap]:
         statement = select(Wap).filter(
             and_(
                 Wap.bssid == wap["bssid"].lower(),

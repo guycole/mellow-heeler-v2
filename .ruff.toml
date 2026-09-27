@@ -1,0 +1,17 @@
+line-length = 88
+target-version = "py312"
+
+exclude = [
+    "**/venv",
+    "**/.venv",
+    "**/__pycache__",
+]
+
+[lint]
+# Keep Ruff aligned with slug-style examples used in sibling repos.
+ignore = [
+    "BLE001",   # broad exception catches used in existing slug-style flows
+    "DTZ005",   # naive datetime.now() pattern used across slug examples
+    "I001",     # preserve existing import grouping/order style
+    "PLR1722",  # allow exit() in __main__ blocks
+]
